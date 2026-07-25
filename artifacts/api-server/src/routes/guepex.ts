@@ -22,7 +22,7 @@ function guepexHeaders() {
 // GET /api/wilayas
 router.get("/wilayas", async (req, res): Promise<void> => {
   try {
-    const response = await fetch(`${GUEPEX_BASE}/wilayas/?page_size=100&is_deliverable=1`, {
+    const response = await fetch(`${GUEPEX_BASE}/wilayas/?page_size=100`, {
       headers: guepexHeaders(),
     });
     if (!response.ok) {
@@ -55,7 +55,7 @@ router.get("/communes", async (req, res): Promise<void> => {
   }
   try {
     const response = await fetch(
-      `${GUEPEX_BASE}/communes/?wilaya_id=${params.data.wilaya_id}&page_size=500&is_deliverable=1`,
+      `${GUEPEX_BASE}/communes/?wilaya_id=${params.data.wilaya_id}&page_size=500`,
       { headers: guepexHeaders() }
     );
     if (!response.ok) {

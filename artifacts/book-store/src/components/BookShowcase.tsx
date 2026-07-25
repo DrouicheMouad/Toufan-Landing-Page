@@ -8,7 +8,7 @@ export function BookShowcase() {
       <div className="relative group shrink-0">
         <div className="absolute -inset-4 bg-black/5 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition duration-1000"></div>
         <img 
-          src="/attached_assets/generated_images/book_cover.jpg" 
+          src={`${import.meta.env.BASE_URL}book_cover.jpg`} 
           alt="تحت راية الطوفان" 
           className="relative w-64 md:w-80 rounded-sm shadow-2xl shadow-black/20 object-cover aspect-[2/3] border border-black/10"
         />
