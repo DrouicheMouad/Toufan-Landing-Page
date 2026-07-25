@@ -1,0 +1,654 @@
+Parcels
+This endpoint represents your parcels, you create or delete one or more parcels at a time, retrieve them with all their details or by filtering them according to your needs.
+
+Endpoints
+GET /v1/parcels
+GET /v1/parcels/:tracking
+POST /v1/parcels
+DELETE /v1/parcels/:tracking
+PATCH /v1/parcels/:tracking
+Important: Personal data is masked in GET and PATCH responses (firstname, familyname, contact_phone, address, phone_number and the phone segment in qr_text). This does not affect POST requests.
+Retrieve the parcels
+Retrieves the details of your parcels.
+
+GET /v1/parcelsPHP
+‹?php
+
+    $url = "https://api.guepex.app/v1/parcels/"; // the parcel's endpoint
+    $api_id = "08467949173865045243"; // your api ID
+    $api_token = "6tDv0VDFh5MKfvcyQtO3eouLUT8Sc7w5FngPzXRrOHPyq29zWY4Jlpr2dB1jaiRJ"; // your api token
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+            'X-API-ID: '. $api_id,
+            'X-API-TOKEN: '. $api_token
+        ),
+    ));
+
+    $response_json = curl_exec($curl);
+    curl_close($curl);
+
+    $response_array = json_decode($response_json,true); // converting the json to a php array
+
+    /* now handle the response_array like you need
+
+        ...
+
+    */
+Response
+{
+        "has_more": true,
+        "total_data": 7457,
+        "data":[
+            {
+                "tracking": "yal-123456",
+                "order_id": "#eadoeead",
+                "firstname": "M*****d",
+                "familyname": "E* A****",
+                "contact_phone": "0********9",
+                "address": "C*** K****",
+                "is_stopdesk": 1,
+                "stopdesk_id": 163001,
+                "stopdesk_name": "Centre de Bordj El Kiffan",
+                "from_wilaya_id": 5,
+                "from_wilaya_name": "Batna",
+                "to_commune_id": 1630,
+                "to_commune_name": "Bordj El Kiffan",
+                "to_wilaya_id": 16,
+                "to_wilaya_name": "Alger",
+                "product_list": "Machine à café",
+                "price": 2400,
+                "do_insurance" : true,
+                "declared_value" : 5000,
+                "delivery_fee": 500,
+                "freeshipping": 0,
+                "import_id": 233,
+                "date_creation": "2020-03-25 18:44:22",
+                "date_expedition": null,
+                "date_last_status": "2020-03-25 18:44:22",
+                "last_status": "Centre",
+                "taxe_percentage": 1.5,
+                "taxe_from": 10000,
+                "taxe_retour": 300,
+                "parcel_type": "ecommerce",
+                "parcel_sub_type": null,
+                "has_receipt": null,
+                "length": null,
+                "width": null,
+                "height": null,
+                "weight": null,
+                "has_recouvrement": 1,
+                "return_center_code": "RC01",
+                "current_center_id": 190201,
+                "current_center_name": "Centre de Aïn Arnat",
+                "current_wilaya_id": 19,
+                "current_wilaya_name": "Sétif",
+                "current_commune_id": 1902,
+                "current_commune_name": "Aïn Arnat",
+                "payment_status": "not-ready",
+                "payment_id": null,
+                "has_exchange": 0,
+                "product_to_collect": null,
+                "label": "https://yalidine.app/app/bordereau.php?tracking=yal-64BPEK",
+                "pin": "1572",
+                "qr_text": "16,yal-123456,1630,Store Name,6548,16,0********9"
+            },
+            {
+                ...
+            }
+        ],
+        "links": {
+            "self": "https://api.guepex.app/v1/parcels/",
+            "next": "https://api.guepex.app/v1/parcels/?page=2"
+        }
+    }
+You can access a specific parcel by supplying its tracking in the path or using the tracking parameter to retrieve many parcels at one request.
+
+Example suplying a tracking in the path
+
+GET /v1/parcels/yal-123456
+Example using the tracking parameter
+
+GET /v1/parcels/?tracking=yal-123456,yal-789123,yal-456789
+Filters
+You can filter your query using one or many parameters
+
+Example
+To get only the parcels that has freeshipping delivery use the following
+
+GET /v1/parcels/?freeshipping=true
+You can filter your request deeper by using more than one filter; for example to get the parcels that has a freeshipping but only for the destination of Algiers use that:
+
+GET /v1/parcels/?freeshipping=true&to_wilaya_id=16
+You can also assign many values to the same filter; you have only to separate the values by a comma
+For example: to get the parcels of two specific last status: Expédié, Livré; use the following:
+
+GET /v1/parcels/?last_status=Expédié,Livré
+Important
+In the same filter, you can use many values separated by a comma. Except for the dates filters
+Parameter	Type	Description
+tracking	string	The unique identifier for the parcel.
+order_id	string	The receiver’s order id
+import_id	integer	The id of the operation of bulk-creation of the parcel (through importation or API creation)
+to_wilaya_id	integer	The receiver’s wilaya id.
+to_commune_name	string	The receiver’s commune name.
+is_stopdesk	boolean	Whether the delivery is done in a stop-desk or home delivery.
+True means delivery in stop desk
+False means home delivery
+is_exchange	boolean	Whether or not the package is the annexed parcel for an exchange request.
+has_exchange	boolean	Whether or not you want to make an exchange request for this parcel.
+economic	boolean	Whether or not the parcel is in economic delivery type.
+freeshipping	boolean	Whether the delivery fee is free (paid by the sender).
+date_creation	string	The parcel’s date of creation in the format YYYY-MM-DD
+There are two possible way to use this filter:
+• Only one date:
+Provide only one date in the value to get all the results of this specific date.
+date_creation=2020-06-01
+• Between two dates
+Provide two dates in the value separated by a comma to get the result between the first and the second date
+date_creation=2020-06-01,2020-07-01
+date_last_status	string	The parcel’s date of the last status in the format YYYY-MM-DD
+There are two possible way to use this filter:
+• Only one date:
+Provide only one date in the value to get all the results of this specific date.
+date_last_status=2020-06-01
+• Between two dates
+Provide two dates in the value separated by a comma to get the result between the first and the second date
+date_last_status=2020-06-01,2020-07-01
+payment_status	string	The current payment status of the parcel.
+It can be one of the following:
+• not-ready
+• ready
+• receivable
+• payed
+last_status	string	The current status of the parcel's delivery.
+This status can be one of the following:
+• Pas encore expédié
+• A vérifier
+• En préparation
+• Pas encore ramassé
+• Prêt à expédier
+• En passation
+• Ramassé
+• Bloqué
+• Débloqué
+• Transfert
+• Expédié
+• Centre
+• En localisation
+• Vers Wilaya
+• En transit
+• Reçu à Wilaya
+• En attente du client
+• Prêt pour livreur
+• Sorti en livraison
+• En attente
+• Annulé
+• En alerte
+• Tentative échouée
+• Livré
+• Echèc livraison
+• Retour vers centre
+• Retourné au centre
+• Retour transfert
+• Retour groupé
+• Retour à retirer
+• Retour non retiré
+• Colis abandonné
+• Retour vers vendeur
+• Retourné au vendeur
+• Echange échoué
+To get all the details of the parcels status, see the histories docs 
+fields	string	You can specify which fields you want returned by using the field parameter and listing each field separated by a comma (see fileds section below)
+page	integer	the number of the page you would request
+page_size	integer	the number of result in the same page
+order_by	string	By default, the results in the parcels response are ordered by the date_creation in a descending way.
+You can override the default by using the parameter orderd_by and passing one of the following values: • date_creation • date_last_status • tracking • order_id • import_id • to_wilaya_id • to_commune_id • last_status
+desc	Null	(doesn't need any value) Order the result descening
+asc	Null	(doesn't need any value) Order the result ascending
+Fields
+The response returns a set of fields by default. However, you can specify which fields you want returned by using the field parameter and listing each field separated by a comma. This overrides the defaults and returns only the fields you specify.
+
+Example, to get only the fields of to_wilaya_name and the tracking, use the following:
+
+GET /v1/parcels/?fields=to_wilaya_name,tracking
+Field	Type	Description
+Tracking	string	The unique identifier for the parcel.
+In some cases, the field "tracking" is always present the result, even if you don't ask for it
+order_id	string	The receiver’s order id
+Firstname	String	The receiver’s first name. (Masked in response)
+familyname	string	The receiver’s family name. (Masked in response)
+contact_phone	string	The receiver’s phone numbers. (Masked in response)
+Address	string	The receiver’s address. (Masked in response)
+is_stopdesk	boolean	Whether the delivery is done in a stop-desk or home delivery.
+• True means delivery in stop desk
+• False means home delivery
+stopdesk_id	integer	If is_stopdesk is true, This value is the center's id of the stop-desk where you want to send the parcel to.
+from_wilaya_id	integer	The sender’s wilaya id.
+from_wilaya_name	string	The sender’s wilaya name.
+to_commune_id	integer	The receiver’s commune id.
+to_commune_name	string	The receiver’s commune name.
+to_wilaya_id	integer	The receiver’s wilaya id.
+to_wilaya_name	string	The receiver’s wilaya name.
+product_list	string	The description of the parcel’s content.
+Price	integer	The price of the parcel’s content. (equal or between 0 and 150000)
+do_insurance	boolean	Whether insurance is enabled on the parcel. This is the effective result stored by the system and may differ from the requested do_insurance when insurance is disabled for the account.
+declared_value	integer	Represents the financial estimation of the items within the parcel.
+delivery_fee	integer	The delivery fee of the parcel.
+freeshipping	boolean	Whether the delivery fee is free (paid by the sender).
+import_id	integer	The id of the operation of bulk-creation of the parcel (through importation or API creation)
+date_creation	string	The parcel’s date of creation in the format YYYY-MM-DD HH:MM:SS
+date_expedition	string	The parcel’s date of expedition in the format YYYY-MM-DD HH:MM:SS
+date_last_status	string	The parcel’s date of the last status in the format YYYY-MM-DD HH:MM:SS
+last_status	string	The current status of the parcel's delivery.
+This status can be one of the following:
+• Pas encore expédié
+• A vérifier
+• En préparation
+• Pas encore ramassé
+• Prêt à expédier
+• En passation
+• Ramassé
+• Bloqué
+• Débloqué
+• Transfert
+• Expédié
+• Centre
+• En localisation
+• Vers Wilaya
+• En transit
+• Reçu à Wilaya
+• En attente du client
+• Prêt pour livreur
+• Sorti en livraison
+• En attente
+• Annulé
+• En alerte
+• Tentative échouée
+• Livré
+• Echèc livraison
+• Retour vers centre
+• Retourné au centre
+• Retour transfert
+• Retour groupé
+• Retour à retirer
+• Retour non retiré
+• Colis abandonné
+• Retour vers vendeur
+• Retourné au vendeur
+• Echange échoué
+To get all the details of the parcels status, see the histories docs 
+taxe_percentage	float	This percentage represents the fee of cash on delivery operation
+The fee can be calculated as follows :
+COD fees = (tax_percentage * price) / 100
+taxe_from	integer	The value of price from which the taxe_percentage fee is applicable.
+In clear, if price is greater than or equal to taxe_from, the taxe_percentage is applicable
+taxe_retour	integer	This is the value of the Return fees of the parcel
+parcel_type	string	The type of the parcel, it can be one of the following
+• classic
+• ecommerce
+• multiseller
+parcel_sub_type	string	The sub type of the parcel, it can be one of the following
+• accuse
+• exchange
+• rcc
+• rccback
+• sm
+has_receipt	boolean	Whether the parcel has an acknowledgment of receipt or not.
+Length	integer	The parcel length in centimeters (cm)
+Width	integer	The parcel width in centimeters (cm)
+Height	integer	The parcel height in centimeters (cm)
+Weight	integer	The parcel weight
+has_recouvrement	boolean	Whether or not the parcel has a cash on delivery
+return_center_code	string	The code of the seller return center (RC)
+current_center_id	integer	The id of the center in which the parcel is currently located.
+current_center_name	string	The name of the center in which the parcel is currently located.
+current_wilaya_id	integer	The id of the wilaya in which the parcel is currently located.
+current_wilaya_name	string	The name of the wilaya in which the parcel is currently located.
+current_commune_id	integer	The id of the commune in which the parcel is currently located.
+current_commune_name	string	The name of the commune in which the parcel is currently located.
+payment_status	string	The current payment status of the parcel.
+It can be one of the following:
+• not-ready
+• ready
+• receivable
+• payed
+payment_id	string	the payment manifest id to which the package belongs
+has_exchange	boolean	Whether or not the package has an annexed parcel for an exchange request.
+economic	boolean	Whether or not the parcel is in economic delivery type.
+product_to_collect	string	When has_exchange is true, this value is the designation of what to return in the annexed exchange parcel.
+label	string	The link of the current parcel label.
+labels	string	The link of all the labels of the created parcels through this request.
+qr_text	string	The text value of the QR_CODE present in the label. (Phone segment masked in response)
+pin	string	The pin value of the parcel present in the label
+Order
+By default, the results in the parcels response are ordered by the date_creation in a descending way.
+
+You can override the default by using the parameter orderd_by and passing one of the following values:
+
+date_creation
+date_last_status
+tracking
+order_id
+import_id
+to_wilaya_id
+to_commune_id
+last_status
+Example, ordering by date_last_status:
+
+GET /v1/parcels/?order_by=date_last_status
+You can specify the order method by using the parameter DESC or ASC in your query, without any value
+
+Example, ordering in an ascending way by date_last_status:
+
+GET /v1/parcels/?order_by=date_last_status&asc
+Edit the parcels
+Editing a parcel is only possible if it last status is en préparation.
+
+You must specifiy the parcel to edit in the url, in a PATCH request
+
+Personal data is masked in the PATCH response (firstname, familyname, contact_phone, address). Do not use masked values to update your own database, as they can overwrite correct data.
+PATCH /v1/parcels/yal-123456
+
+To edit the specified parcels you can pass one or multiple parameters and their new values. Any none provided parameters will be left unchanged.
+
+For example, if you pass the is_stopdesk parameter with the value true, you are changing the delivery type of the parcel to the stop desk delivery. All other parameters remain unchanged.
+
+As said before, you can provide many parameters in one request. all none provided parameters won't be changed.
+
+PATCH /v1/parcels/:trackingPHP
+‹?php
+
+    $url = "https://api.guepex.app/v1/parcels/"; // the parcel's edition endpoint
+    $api_id = "08467949173865045243"; // your api ID
+    $api_token = "6tDv0VDFh5MKfvcyQtO3eouLUT8Sc7w5FngPzXRrOHPyq29zWY4Jlpr2dB1jaiRJ"; // your api token
+
+    // you must provide the tracking in the end of the url
+    $tracking = "yal-123456"; // parcel to edit
+    $url .= $tracking; // adding the $tracking to the url
+
+    $data = array ( // array of parameters to edit and their new values
+        // Example : changing the firstname and the freeshipping
+        "firstname"=>"Mustapha",
+        "freeshipping"=> true
+    );
+
+    $postdata = json_encode($data);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH'); // we use the patch method
+    // curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            "X-API-ID: ". $api_id,
+            "X-API-TOKEN: ". $api_token,
+            "Content-Type: application/json"
+        )
+    );
+
+    $result = curl_exec($ch);
+    curl_close($ch);
+
+    header("Content-Type: application/json");
+    echo $result;
+
+Parameters
+Parameter	Required	Type	Description
+order_id	No	string	A string representing the order id of the parcel.
+firstname	No	string	The receiver’s first name. (Masked in response)
+familyname	No	string	The receiver’s family name. (Masked in response)
+contact_phone	No	string	The receiver’s phone numbers (can be separated by commas if many). (Masked in response)
+address	No	string	The receiver’s address. (Masked in response)
+from_wilaya_name	No	string	A string representing the senders’s wilaya name.
+You can get the list of the acceptable wilaya names in the WILAYAS endpoint. Please see the wilayas docs.
+to_commune_name	Conditional	string	A string representing the receiver’s commune name.
+This parameter is required when you provide the parameter to_wilaya_commune.
+You can get the list of the acceptable commune names in the COMMUNES endpoint. Please see the communes docs.
+to_wilaya_name	No	string	A string representing the receiver’s wilaya name.
+When you use this parameter, the parameter to_commune_name becomes required.
+You can get the list of the acceptable wilaya names in the WILAYAS endpoint. Please see the wilayas docs.
+product_list	No	string	The description of the shipment’s content.
+Price	No	integer	An integer amount representing the price you want to recover from the receiver. (equal or between 0 and 150000)
+do_insurance	No	boolean	Whether or not you request insurance. The system may automatically force do_insurance to false according to the account configuration.
+declared_value	No	integer	Represents the financial estimation of the items within the parcel. (must be between 0 and 150000)
+Length	No	integer	An integer amount representing the length of the parcel’s content in centimeters (cm). (greater than or equal to 0)
+Width	No	integer	An integer amount representing the width of the parcel’s content in centimeters (cm). (greater than or equal to 0)
+Height	No	integer	An integer amount representing the height of the parcel’s content in centimeters (cm). (greater than or equal to 0)
+Weight	No	integer	An integer amount representing the weight of the parcel’s content. (greater than or equal to 0)
+freeshipping	No	boolean	A Boolean representing whether the delivery fee is free (paid by the sender) or not.
+True = paid by the sender.
+false = paid by the receiver.
+is_stopdesk	No	boolean	Whether the delivery will be done in a stop-desk or home delivery.
+True = delivery in stop desk
+False = home delivery
+stopdesk_id	Conditional	integer	When is_stopdesk is true, this parameter must be included, this is the center's id of the stop-desk where you want to send the parcel to.
+has_exchange	No	boolean	Whether or not you want to make an exchange request for this parcel.
+When you set the value of this parameter to true, the parmater product_to_collect becomes required.
+product_to_collect	conditional	string	This parameter is required if has_exchange is true, optional if not. When has_exchange is true, this value is the designation of what to return in the annexed exchange parcel.
+Return
+Returns the provided parcel object if the update succeeded. Throws an error if something is invalid.
+(e.g. not specifying the product_to_collect when setting has_exchange to true).
+
+Response (json)
+{
+   "tracking":"yal-123456",
+   "order_id":"myOrderId",
+   "firstname":"M******a",
+   "familyname":"M*****d",
+   "contact_phone":"0********9",
+   "from_wilaya_name": "Adrar",
+   "address":"C*** K****",
+   "to_commune_name":"Bordj El Kiffan",
+   "to_wilaya_name":"Alger",
+   "product_list":"the product list",
+   "length": 10,
+   "height": 1,
+   "width": 20,
+   "weight": 3,
+   "price":3000,
+   "do_insurance": true,
+   "declared_value": 10000,
+   "freeshipping":true,
+   "is_stopdesk":false,
+   "stopdesk_id": null,
+   "has_exchange":0,
+   "product_to_collect":null,
+   "label":"https:\/\/guepex.app\/app\/bordereau.php?tracking=yal-123456"
+}
+Create the parcels
+To create a parcel you need to send an array of an array of one or many parcels.
+
+POST /v1/parcelsPHP
+‹?php
+
+    $url = "https://api.guepex.app/v1/parcels/"; // the parcel's creation endpoint
+    $api_id = "08467949173865045243"; // your api ID
+    $api_token = "6tDv0VDFh5MKfvcyQtO3eouLUT8Sc7w5FngPzXRrOHPyq29zWY4Jlpr2dB1jaiRJ"; // your api token
+
+    $data =
+        array( // the array that contains all the parcels
+            array ( // first parcel
+                "order_id"=>"MyFirstOrder",
+                "from_wilaya_name"=>"Batna",
+                "firstname"=>"Brahim",
+                "familyname"=>"Mohamed",
+                "contact_phone"=>"0123456789,",
+                "address"=>"Cité Kaidi",
+                "to_commune_name"=>"Bordj El Kiffan",
+                "to_wilaya_name"=>"Alger",
+                "product_list"=>"Presse à café",
+                "price"=>3000,
+                "do_insurance" => true,
+                "declared_value" => 3500,
+                "height"=> 10,
+                "width" => 20,
+                "length" => 30,
+                "weight" => 6,
+                "freeshipping"=> true,
+                "is_stopdesk"=> true,
+                "stopdesk_id" => 163001,
+                "has_exchange"=> 0,
+                "product_to_collect" => null
+            ),
+            array ( // second parcel
+                "order_id" =>"MySecondOrder",
+                "from_wilaya_name"=>"Batna",
+                "firstname"=>"رفيدة",
+                "familyname"=>"بن مهيدي",
+                "contact_phone"=>"0123456789",
+                "address"=>"حي الياسمين",
+                "to_commune_name"=>"Ouled Fayet",
+                "to_wilaya_name"=>"Alger",
+                "product_list"=>"كتب الطبخ",
+                "price"=>2400,
+                "do_insurance" => false,
+                "declared_value" => 3500,
+                "height" => 10,
+                "width" => 20,
+                "length" => 30,
+                "weight" => 6,
+                "freeshipping"=>0,
+                "is_stopdesk"=>0,
+                "has_exchange"=> false,
+            ),
+            array ( // third parcel
+                ...
+            ),
+            array( // etc
+                ...
+            )
+        );
+
+    $postdata = json_encode($data);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            "X-API-ID: ". $api_id,
+            "X-API-TOKEN: ". $api_token,
+            "Content-Type: application/json"
+        )
+    );
+
+    $result = curl_exec($ch);
+    curl_close($ch);
+
+    header("Content-Type: application/json");
+    echo $result;
+Parameters
+Parameter	Required	Type	Description
+order_id	required	string	A string representing the order id of the parcel, you cannot use duplicated order id in the same request, so this must be unique for each parcel in the same request.
+When the parcel is created, this order_id let you know which tracking is affected to which order.
+from_wilaya_name	required	string	A string representing the sender’s wilaya name.
+You can get the list of the acceptable wilaya names in the WILAYAS endpoint. Please see the wilayas docs.
+firstname	required	string	The receiver’s first name.
+familyname	required	string	The receiver’s family name
+contact_phone	required	string	The receiver’s phone numbers.
+Must start with 0 and contain 9 digits for mobile or 8 digits for landline (e.g. 0550123456 for mobile, 023456789 for landline). Multiple numbers can be separated by commas.
+address	required	string	The receiver’s address
+to_commune_name	required	string	A string representing the receiver’s commune name.
+You can get the list of the acceptable commune names in the COMMUNES endpoint. Please see the communes docs.
+to_wilaya_name	required	string	A string representing the receiver’s wilaya name.
+You can get the list of the acceptable wilaya names in the WILAYAS endpoint. Please see the wilayas docs.
+product_list	required	string	The description of the shipment’s content.
+Price	required	integer	An integer amount representing the price you want to recover from the receiver. (equal or between 0 and 150000)
+do_insurance	Required	boolean	Whether or not you request insurance. The system may automatically force do_insurance to false according to the account configuration.
+declared_value	Required	integer	Represents the financial estimation of the items within the parcel. (must be between 0 and 150000)
+Length	Required	integer	An integer amount representing the length of the parcel’s content in centimeters (cm). (greater than or equal to 0)
+Width	Required	integer	An integer amount representing the width of the parcel’s content in centimeters (cm). (greater than or equal to 0)
+Height	Required	integer	An integer amount representing the height of the parcel’s content in centimeters (cm). (greater than or equal to 0)
+Weight	Required	integer	An integer amount representing the weight of the parcel’s content. (greater than or equal to 0)
+freeshipping	required	boolean	A Boolean representing whether the delivery fee is free (paid by the sender) or not.
+True = paid by the sender.
+false = paid by the receiver.
+is_stopdesk	required	boolean	Whether the delivery will be done in a stop-desk or home delivery.
+True = delivery in stop desk, you must include the param stopdesk_id, see below.
+False = home delivery
+stopdesk_id	conditional	string	This parameter is required if is_stopdesk is true, optional if not. This value is the center's id of the stop-desk where you want to send the parcel to.
+has_exchange	required	boolean	A Boolean representing Whether or not you want to make an exchange request for this parcel.
+economic	Not required	boolean	Whether or not the parcel is in economic delivery type.
+product_to_collect	conditional	string	This parameter is required if has_exchange is true, optional if not. When has_exchange is true, this value is the designation of what to return in the annexed exchange parcel.
+Return
+Returns the order_id and the tracking associated with it for each parcel.
+Parcels with valid data will be created successfully with success: true.
+Parcels with errors will fail with success: false, but the valid ones will still be processed.
+
+Response (json)
+{
+    "MyFirstOrder": {
+        "success": true,
+        "order_id": "MyFirstOrder",
+        "tracking": "yal-12345A",
+        "import_id": 234,
+        "label" : "https://guepex.app/app/bordereau.php?tracking=yal-12345A&token=eVIzd0lCdFRGdXlmbkcwK1JBOWlHUT09",
+        "labels" : "https://guepex.app/app/bordereau.php?import_id=352&si=5455878&token=SFUxek1qQVdhbXV2QjZDUXZM6548",
+        "message" : ""
+    },
+    "MySecondOrder": {
+        "success": false,
+        "order_id": "MySecondOrder",
+        "tracking": null,
+        "import_id": null,
+        "label" : null,
+        "labels" : null,
+        "message" : "The do_insurance parameter must be of type boolean"
+    }
+}
+Delete the parcels
+Deleting a parcel is only possible if it last status is en préparation.
+
+You can delete the parcels by two method.
+
+Method 1: making a delete request to a specific parcel object
+
+DELETE /v1/parcels/yal-123456
+
+Method 2: Deleting one or many at one time by using the tracking parameter
+
+DELETE /v1/parcels/?tracking=yal-123456,yal-789102
+
+If you choose the second method, separate the tracking values by a comma
+
+Parameters
+Parameter	Required	Type	Description
+tracking	string	Conditional	optional if you use Method 1.
+Required if you use Method 2.
+A string representing one or multiple parcels to delete (separated by commas).
+Returns
+This return the decision of deletion of each tracking or an error.
+
+Response
+{
+        {
+            "tracking": "yal-12345A",
+            "deleted": true // Deleted successfully
+        },
+        {
+            "tracking": "yal-12345A",
+            "deleted": false /* Deletion Impossible for one of the following reasons:
+                                cannot be deleted or
+                                misspelled or
+                                does not exist or
+                                already deleted before
+                             */
+        },
+    }

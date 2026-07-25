@@ -1,0 +1,135 @@
+Communes
+Retrieves the communes with all their details or by filtering them according to your needs.
+
+Endpoints
+GET /v1/communes
+GET /v1/communes/:id
+Retrieve the Communes
+Retrieves the communes list with their details.
+
+GET /v1/communesPHP
+‹?php
+
+$url = "https://api.guepex.app/v1/communes/"; // the communes endpoint
+$api_id = "08467949173865045243"; // your api ID
+$api_token = "6tDv0VDFh5MKfvcyQtO3eouLUT8Sc7w5FngPzXRrOHPyq29zWY4Jlpr2dB1jaiRJ"; // your api token
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+    CURLOPT_URL => $url,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'GET',
+    CURLOPT_HTTPHEADER => array(
+        'X-API-ID: '. $api_id,
+        'X-API-TOKEN: '. $api_token
+    ),
+));
+
+$response_json = curl_exec($curl);
+curl_close($curl);
+
+$response_array = json_decode($response_json,true); // converting the json to a php array
+
+/* now handle the response_array like you need
+
+    ...
+
+*/
+Response
+{
+    "has_more": true,
+    "total_data": 1541,
+    "data":[
+        {
+            "id": 101,
+            "name": "Adrar",
+            "wilaya_id": 1,
+            "wilaya_name": "Adrar",
+            "has_stop_desk": 0,
+            "is_deliverable": 1,
+            "delivery_time_parcel": 20,
+            "delivery_time_payment": 10
+        },
+        {
+            ...
+        }
+    ],
+    "links": {
+        "self": "https://api.guepex.app/v1/communes/",
+        "next": "https://api.guepex.app/v1/communes/?page=2"
+    }
+}
+You can access a specific commune by supplying its id in the path or using the id parameter to retrieve many in the same request.
+
+Example suplying an id in the path
+
+GET /v1/communes/1630
+Example using the id parameter
+
+GET /v1/communes/?id=1630,1601,1620
+Filters
+You can filter your query using one or many parameters
+
+Example
+To get only the communes that has a stop desk use the paramater has_stop_desk:
+
+GET /v1/communes/?has_stop_desk=true
+You can filter your request deeper by using more than one filter; for example to get the communes that has a stop desk but only for Algiers wilaya use that:
+
+GET /v1/communes/?has_stop_desk=true&wilaya_id=16
+You can also assign many values to the same filter; you have only to separate the values by a comma
+For example: To get the communes of Algiers and Setif and Bejaia use the following:
+
+GET /v1/communes/?wilaya_id=16,19,6
+Important
+In the same filter, you can use many values separated by a comma. Except for the dates filters
+Parameter	Type	Description
+Id	Integer	The identifier of the commune
+wilaya_id	Integer	The commune’s wilaya id
+has_stop_desk	Boolean	Whether or not the commune has a stop desk
+is_deliverable	Boolean	Whether or not the commune is deliverable
+Fields	String	You can specify which fields you want returned by using the field parameter and listing each field separated by a comma (see fields parameter)
+Page	Integer	the number of the page you would request
+page_size	Integer	the number of result in the same page
+order_by	String	By default, the result in the communes results is ordered by id in an ascending way.
+You can override the default by using the parameter orderd_by and passing one of the following values:
+• id
+• wilaya_id
+desc	Null	(doesn't need any value) Order the result descening
+asc	Null	(doesn't need any value) Order the result ascending
+Fields
+The response returns a set of fields by default. However, you can specify which fields you want returned by using the field parameter and listing each field separated by a comma. This overrides the defaults and returns only the fields you specify.
+
+Example, to get only the name of the commune name and if is it deliverable or not is_deliverable, use the following:
+
+GET /v1/communes/?fields=name,is_deliverable
+Field	Type	Description
+Id	integer	The identifier of the commune
+name	String	The commune's name
+wilaya_id	integer	The wilaya id of that commune
+wilaya_name	String	The wilaya name of that commune
+has_stop_desk	boolean	Whether or not this commune has a stop desk
+is_deliverable	boolean	Whether or not this commune is deliverable
+delivery_time_parcel	integer	the average delivery time of the parcel to this commune (days)
+delivery_time_payment	integer	the average delivery time of the payment from this commune (days)
+Order
+By default, the results in the communes response are ordered by the id in a ascending way.
+
+You can override the default by using the parameter orderd_by and passing one of the following values:
+
+id
+wilaya_id
+Example, ordering by wilaya_id:
+
+GET /v1/communes/?order_by=wilaya_id
+You can specify the order method by using the parameter DESC or ASC in your query, without any value
+
+Example, ordering in an descending way by wilaya_id:
+
+GET /v1/communes/?order_by=wilaya_id&desc

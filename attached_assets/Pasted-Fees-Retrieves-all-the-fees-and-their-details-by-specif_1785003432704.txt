@@ -1,0 +1,115 @@
+Fees
+Retrieves all the fees and their details by specifying the starting and the destination wilayas.
+
+Endpoints
+GET /v1/fees/?from_wilaya_id=value1&to_wilaya_id=value2
+Retrieve the fees
+Retrieves the fees list with their details.
+
+GET /v1/feesPHP
+‹?php
+
+$url = "https://api.guepex.app/v1/fees/?from_wilaya_id=5&to_wilaya_id=1"; // the fees endpoint
+$api_id = "08467949173865045243"; // your api ID
+$api_token = "6tDv0VDFh5MKfvcyQtO3eouLUT8Sc7w5FngPzXRrOHPyq29zWY4Jlpr2dB1jaiRJ"; // your api token
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+    CURLOPT_URL => $url,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'GET',
+    CURLOPT_HTTPHEADER => array(
+        'X-API-ID: '. $api_id,
+        'X-API-TOKEN: '. $api_token
+    ),
+));
+
+$response_json = curl_exec($curl);
+curl_close($curl);
+
+$response_array = json_decode($response_json,true); // converting the json to a php array
+
+/* now handle the response_array like you need
+
+    ...
+
+*/
+Response
+{
+    "from_wilaya_name": "Batna",
+    "to_wilaya_name": "Adrar",
+    "zone": 4,
+    "retour_fee": 250,
+    "cod_percentage": 0.75,
+    "insurance_percentage": 0.75,
+    "oversize_fee": 100,
+    "per_commune": {
+        "101": {
+            "commune_id": 101,
+            "commune_name": "Adrar",
+            "express_home": 1400,
+            "express_desk": 1100,
+            "economic_home": null,
+            "economic_desk": null
+        },
+        "119": {
+            "commune_id": 119,
+            "commune_name": "Akabli",
+            "express_home": 1450,
+            "express_desk": 1100,
+            "economic_home": null,
+            "economic_desk": null
+        },
+
+        ... rest of the communes
+    }
+}
+You must supply both: the from_wilaya_id and the to_wilaya_id
+
+Parameter	Type	Description
+from_wilaya_name	string	The name of the starting wilaya
+to_wilaya_name	string	The name of the destination wilaya
+zone	Integer	The zone number representing the route between the starting wilaya and the destination wilaya.
+retour_fee	Integer	The return fee for the zone
+cod_percentage	float	The percentage of COD fees, calculated on the higher value between the declared value and the price.
+insurance_percentage	float	The percentage of insurance fees, calculated on the higher value between the declared value and the price.
+oversize_fee	Integer	This fee applies when your parcel exceeds 5 KG.
+The first 5 KG are free.
+Examples:
+Suppose your threshold is 5 KG and the fee is 50 DA per additional KG.
+Your parcel weighs 4 KG.
+Since the weight is under the 5 KG threshold, no fee is charged.
+Cost: 0 DA
+Your parcel weighs 5 KG.
+Since the weight is exactly 5 KG, no fee is charged.
+Cost: 0 DA
+Your parcel weighs 7 KG.
+The first 5 KG are free. The fee is charged for 2 additional KG (7 KG − 5 KG).
+Cost: 2 KG × 50 DA = 100 DA
+Add this fee to the delivery fee to obtain the total cost.
+commune_id	Integer	The commune’s id
+commune_name	string	The commune’s name
+express_home	Integer	The express home delivery fee including commune taxe (does not include weight fee *).
+express_desk	Integer	The express stop desk delivery fee including commune taxe (does not include weight fee *).
+economic_home	Integer	If applicable to the account, the economy home delivery fee including commune taxe (does not include weight fee *).
+economic_desk	Integer	If applicable to the account, the economy stop desk delivery fee including commune taxe (does not include weight fee *).
+Calculating weight
+To calculate the overweight fee for a parcel, you should use this method:
+Volumetric weight = width (cm) x height (cm) x length (cm) x 0.0002
+Actual weight = the real weight of the parcel in KG
+Billable weight = the biggest between the volumetric weight and the actual weight.
+
+Once the billable weight is determined, use this method:
+
+If the billable weight ≤ 5, then:
+overweight fee = 0 DA
+If the billable weight > 5, then:
+Overweight fee = (billable weight - 5) x oversize_fee
+Now, you add Overweight fee to the delivery fees (express_home, express_desk, economic_home, economic_desk).
+

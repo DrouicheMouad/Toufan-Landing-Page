@@ -1,0 +1,131 @@
+Centers
+Retrieves the Centers with all their details or by filtering them according to your needs.
+
+Endpoints
+GET /v1/centers
+GET /v1/centers/:center_id
+Retrieve the centers
+Retrieves the centers list with their details.
+
+GET /v1/centersPHP
+‹?php
+
+$url = "https://api.guepex.app/v1/centers/"; // the centers endpoint
+$api_id = "08467949173865045243"; // your api ID
+$api_token = "6tDv0VDFh5MKfvcyQtO3eouLUT8Sc7w5FngPzXRrOHPyq29zWY4Jlpr2dB1jaiRJ"; // your api token
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+    CURLOPT_URL => $url,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'GET',
+    CURLOPT_HTTPHEADER => array(
+        'X-API-ID: '. $api_id,
+        'X-API-TOKEN: '. $api_token
+    ),
+));
+
+$response_json = curl_exec($curl);
+curl_close($curl);
+
+$response_array = json_decode($response_json,true); // converting the json to a php array
+
+/* now handle the response_array like you need
+
+    ...
+
+*/
+Response
+{
+    "has_more": false,
+    "total_data": 99,
+    "data": [
+        {
+            "center_id": 10101,
+            "name": "Centre de Adrar",
+            "address": "Cité el moudjahidine",
+            "gps": "27.872313093666232,-0.2959112704377818",
+            "commune_id": 101,
+            "commune_name": "Adrar",
+            "wilaya_id": 1,
+            "wilaya_name": "Adrar"
+        },
+        {
+            ...
+        }
+    ],
+    "links": {
+        "self": "https://api.guepex.app/v1/centers/"
+    }
+}
+You can access a specific center by supplying its center_id in the path or using the center_id parameter to retrieve many in the same request.
+
+Example suplying a center_id in the path
+
+GET /v1/centers/10101
+Example using the center_id parameter
+
+GET /v1/centers/?center_id=10101,163001,190102
+Filters
+You can filter your query using one or many parameters
+
+Example
+To get only the center of the wilaya of Setif use the following :
+
+GET /v1/centers/?wilaya_id=19
+You can also assign many values to the same filter; you have only to separate the values by a comma
+For example: To get the centers of Algiers and Setif and Bejaia use the following:
+
+GET /v1/centers/?wilaya_id=16,19,6
+Parameter	Type	Description
+center_id	Integer	The identifier of the center
+commune_id	Integer	The identifier of the center's commune
+commune_name	String	The commune’s name of the center.
+wilaya_id	Integer	The identifier of the center's wilaya
+wilaya_name	String	The wilaya’s name of the center.
+Fields	String	You can specify which fields you want returned by using the field parameter and listing each field separated by a comma (see fields section below)
+page	Integer	the number of the page you would request
+page_size	Integer	the number of result in the same page
+order_by	String	By default, the result in the centers results is ordered by center_id in an ascending way. You can override the default by using the parameter orderd_by and passing one of the following values:
+• center_id
+• commune_id
+• wilaya_id
+desc	Null	(doesn't need any value) Order the result descening
+asc	Null	(doesn't need any value) Order the result ascending
+Fields
+The response returns a set of fields by default. However, you can specify which fields you want returned by using the field parameter and listing each field separated by a comma. This overrides the defaults and returns only the fields you specify.
+
+Example, to get only the center_id of the centers center_id and its name name, use the following:
+
+GET /v1/centers/?fields=center_id,name
+Field	Type	Description
+center_id	integer	The identifier of the center
+Name	string	the center's name
+address	string	the center's address
+GPS	string	the center's longitude, latitude separated by a comma
+commune_id	Integer	The identifier of the center's commune
+commune_name	String	The commune’s name of the center.
+wilaya_id	Integer	The identifier of the center's wilaya
+wilaya_name	String	The wilaya’s name of the center.
+Order
+By default, the results in the centers response are ordered by the center_id in a ascending way.
+
+You can override the default by using the parameter orderd_by and passing one of the following values:
+
+center_id
+commune_id
+wilaya_id
+Example, ordering by commune_id:
+
+GET /v1/centers/?order_by=commune_id
+You can specify the order method by using the parameter DESC or ASC in your query, without any value
+
+Example, ordering in an descending way by wilaya_id:
+
+GET /v1/centers/?order_by=wilaya_id&desc

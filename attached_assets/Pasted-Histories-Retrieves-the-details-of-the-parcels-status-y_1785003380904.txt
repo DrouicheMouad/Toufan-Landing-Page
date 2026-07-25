@@ -1,0 +1,272 @@
+Histories
+Retrieves the details of the parcels status. you retrieve your parcels status with all their details or by filtering them according to your needs.
+
+Endpoints
+GET /v1/histories
+GET /v1/histories/:tracking
+Retrieve the Histories
+Retrieves the details of your Histories.
+
+GET /v1/historiesPHP
+‹?php
+
+$url = "https://api.guepex.app/v1/histories/"; // the histories endpoint
+$api_id = "08467949173865045243"; // your api ID
+$api_token = "6tDv0VDFh5MKfvcyQtO3eouLUT8Sc7w5FngPzXRrOHPyq29zWY4Jlpr2dB1jaiRJ"; // your api token
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+    CURLOPT_URL => $url,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'GET',
+    CURLOPT_HTTPHEADER => array(
+        'X-API-ID: '. $api_id,
+        'X-API-TOKEN: '. $api_token
+    ),
+));
+
+$response_json = curl_exec($curl);
+curl_close($curl);
+
+$response_array = json_decode($response_json,true); // converting the json to a php array
+
+/* now handle the response_array like you need
+
+    ...
+
+*/
+Response
+{
+    "has_more": true,
+    "total_data": 65465,
+    "data":[
+        {
+            "date_status": "2022-12-17 01:48:09",
+            "tracking": "yal-337AAS",
+            "status": "Sorti en livraison",
+            "reason": "",
+            "center_id": 120201,
+            "center_name": "Centre de Bir el Ater",
+            "wilaya_id": 12,
+            "wilaya_name": "Tébessa",
+            "commune_id": 1202,
+            "commune_name": "Bir el Ater"
+        },
+        {
+            ...
+        }
+    ],
+    "links": {
+        "self": "https://api.guepex.app/v1/histories/",
+        "next": "https://api.guepex.app/v1/histories/?page=2"
+    }
+}
+You can access all the status of a specific parcel by supplying its tracking in the path or using the tracking parameter to retrieve many at the same request.
+
+Example suplying a tracking in the path
+
+GET /v1/histories/yal-123456
+Example using the tracking parameter
+
+GET /v1/histories/?tracking=yal-123456,yal-789123,yal-456789
+Filters
+You can filter your query using one or many parameters
+
+Example
+To get only the status of delivered parcels using the status paramater:
+
+GET /v1/histories/?status=Livré
+You can filter your request deeper by using more than one filter; for example the details of a delivered parcel use that:
+
+GET /v1/histories/?status=Livré&tracking=yal-123456
+You can also assign many values to the same filter; you have only to separate the values by a comma
+For example: To get the details of the status of delivery of two parcels use the following:
+
+GET /v1/histories/?status=Livré&tracking=yal-123456,yal-789123
+Important
+In the same filter, you can use many values separated by a comma. Except for the dates filters
+Parameter	Type	Description
+Tracking	string	The identifier of the parcels.
+Status	string	The status of the parcel
+This status can be one of the following:
+• Pas encore expédié
+• A vérifier
+• En préparation
+• Pas encore ramassé
+• Prêt à expédier
+• En passation
+• Ramassé
+• Bloqué
+• Débloqué
+• Transfert
+• Expédié
+• Centre
+• En localisation
+• Vers Wilaya
+• En transit
+• Reçu à Wilaya
+• En attente du client
+• Prêt pour livreur
+• Sorti en livraison
+• En attente
+• Annulé
+• En alerte
+• Alerte résolue
+• Tentative échouée
+• Livré
+• Echèc livraison
+• Retour vers centre
+• Retourné au centre
+• Retour transfert
+• Retour groupé
+• Retour à retirer
+• Retour non retiré
+• Colis abandonné
+• Retour vers vendeur
+• Retourné au vendeur
+• Echange échoué
+date_status	string	The status’s date of creation in the format YYYY-MM-DD.
+There are two possible way to use this filter.
+Only one date:
+Provide only one date in the value to get all the results of this specific date.
+date_status=2020-06-01
+Between two dates
+Provide two dates in the value separated by a comma to get the result between the first and the second date
+date_status=2020-06-01,2020-07-01
+Reason	string	The reason of a failed delivery attempt or a parcel hold
+
+For the failed delivery :
+• Téléphone injoignable
+• Client ne répond pas
+• Faux numéro
+• Client absent (reporté)
+• Client absent (échoué)
+• Annulé par le client
+• Commande double
+• Le client n'a pas commandé
+• Produit erroné
+• Produit manquant
+• Produit cassé ou défectueux
+• Client incapable de payer
+• Wilaya erronée
+• Commune erronée
+• Client no-show
+• Adresse non livrable
+
+For the parcel hold:
+• Document manquant
+• Produit interdit
+• Produit dangereux
+• Fausse déclaration
+Fields	string	You can specify which fields you want returned by using the field parameter and listing each field separated by a comma (see fields section below)
+Page	integer	the number of the page you would request
+page_size	integer	the number of result in the same page
+order_by	string	By default, the results in the histories response are ordered by the date_status in a descending way.
+You can override the default by using the parameter orderd_by and passing one of the following values:
+• date_status
+• tracking
+• status
+• reason
+desc	Null	(doesn't need any value) Order the result descening
+asc	Null	(doesn't need any value) Order the result ascending
+Fields
+The response returns a set of fields by default. However, you can specify which fields you want returned by using the field parameter and listing each field separated by a comma. This overrides the defaults and returns only the fields you specify.
+
+Example, to get only the fields of tracking and the status, use the following:
+
+GET /v1/histories/?fields=tracking,status
+Field	Type	Description
+date_status	string	The status’s date of creation in the format YYYY-MM-DD HH:MM:SS.
+tracking	string	The unique identifier for the parcel.
+Status	string	The status of a the parcel
+This status can be one of the following:
+• Pas encore expédié
+• A vérifier
+• En préparation
+• Pas encore ramassé
+• Prêt à expédier
+• En passation
+• Ramassé
+• Bloqué
+• Débloqué
+• Transfert
+• Expédié
+• Centre
+• En localisation
+• Vers Wilaya
+• En transit
+• Reçu à Wilaya
+• En attente du client
+• Prêt pour livreur
+• Sorti en livraison
+• En attente
+• Annulé
+• En alerte
+• Alerte résolue
+• Tentative échouée
+• Livré
+• Echèc livraison
+• Retour vers centre
+• Retourné au centre
+• Retour transfert
+• Retour groupé
+• Retour à retirer
+• Retour non retiré
+• Colis abandonné
+• Retour vers vendeur
+• Retourné au vendeur
+• Echange échoué
+reason	string	The reason of a failed delivery attempt or a parcel hold
+
+For the failed delivery :
+• Téléphone injoignable
+• Client ne répond pas
+• Faux numéro
+• Client absent (reporté)
+• Client absent (échoué)
+• Annulé par le client
+• Commande double
+• Le client n'a pas commandé
+• Produit erroné
+• Produit manquant
+• Produit cassé ou défectueux
+• Client incapable de payer
+• Wilaya erronée
+• Commune erronée
+• Client no-show
+• Adresse non livrable
+
+For the parcel hold:
+• Document manquant
+• Produit interdit
+• Produit dangereux
+• Fausse déclaration
+center_id	integer	The id of the center where the status took place
+center_name	string	The name of the center where the status took place
+wilaya_id	integer	The id of the wilaya where the status took place
+wilaya_name	string	The name of the wilaya where the status took place
+commune_id	integer	The id of the commune where the status took place
+commune_name	string	The name of the commune where the status took place
+Order
+By default, the results in the histories response are ordered by the date_status in a descending way.
+
+You can override the default by using the parameter orderd_by and passing one of the following values:
+
+date_status
+tracking
+status
+reason
+Example, ordering by tracking:
+
+GET /v1/histories/?order_by=tracking
+You can specify the order method by using the parameter DESC or ASC in your query, without any value
+
+Example, ordering in an ascending way by tracking:
+
+GET /v1/histories/?order_by=tracking&asc
