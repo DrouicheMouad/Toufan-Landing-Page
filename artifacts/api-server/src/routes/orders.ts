@@ -8,7 +8,7 @@ const router: IRouter = Router();
 
 const GUEPEX_BASE = "https://api.guepex.app/v1";
 const BOOK_NAME = "تحت راية الطوفان";
-const FROM_WILAYA = "Sidi Bel Abèss";
+const FROM_WILAYA = "Sidi Bel Abbès";
 const SELLER_EMAIL = "mouaddrouiche22@gmail.com";
 
 function guepexHeaders() {
@@ -192,15 +192,8 @@ router.post("/orders", async (req, res): Promise<void> => {
     ),
   ]).catch((err) => logger.error({ err }, "Notification error"));
 
-  if (!success) {
-    res.status(500).json(
-      CreateOrderResponse.parse({ success: false, tracking: null, label: null, message: errorMessage })
-    );
-    return;
-  }
-
-  res.status(201).json(
-    CreateOrderResponse.parse({ success: true, tracking, label, message: null })
+  res.status(200).json(
+    CreateOrderResponse.parse({ success, tracking, label, message: errorMessage })
   );
 });
 
