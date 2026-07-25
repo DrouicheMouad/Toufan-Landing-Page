@@ -13,6 +13,7 @@ export const ordersTable = pgTable("orders", {
   is_stopdesk: boolean("is_stopdesk").notNull(),
   stopdesk_id: integer("stopdesk_id"),
   address: text("address"),
+  delivery_price: integer("delivery_price").notNull(),
   success: boolean("success").notNull().default(false),
   error_message: text("error_message"),
   created_at: timestamp("created_at").defaultNow().notNull(),

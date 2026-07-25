@@ -224,6 +224,7 @@ components:
         - to_wilaya_name
         - to_commune_name
         - is_stopdesk
+        - delivery_price
       properties:
         firstname:
           type: string
@@ -244,6 +245,9 @@ components:
           type: boolean
         stopdesk_id:
           type: ["integer", "null"]
+        delivery_price:
+          type: integer
+          minimum: 0
 
     OrderResult:
       type: object

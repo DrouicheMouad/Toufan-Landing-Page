@@ -76,6 +76,8 @@ export const GetCentersResponse = zod.array(GetCentersResponseItem)
 
 export const createOrderBodyContactPhoneMin = 9;
 
+export const createOrderBodyDeliveryPriceMin = 0;
+
 
 
 export const CreateOrderBody = zod.object({
@@ -86,7 +88,8 @@ export const CreateOrderBody = zod.object({
   "to_wilaya_name": zod.string(),
   "to_commune_name": zod.string(),
   "is_stopdesk": zod.boolean(),
-  "stopdesk_id": zod.number().nullish()
+  "stopdesk_id": zod.number().nullish(),
+  "delivery_price": zod.number().min(createOrderBodyDeliveryPriceMin)
 })
 
 export const CreateOrderResponse = zod.object({

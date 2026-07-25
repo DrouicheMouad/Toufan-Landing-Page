@@ -1,10 +1,14 @@
 import React from "react"
+import { BOOK_PRICE } from "@workspace/api-zod"
 
 interface OrderSuccessProps {
   trackingNumber: string;
+  deliveryPrice?: number;
 }
 
-export function OrderSuccess({ trackingNumber }: OrderSuccessProps) {
+export function OrderSuccess({ trackingNumber, deliveryPrice }: OrderSuccessProps) {
+  const totalPrice = deliveryPrice !== undefined ? BOOK_PRICE + deliveryPrice : null
+
   return (
     <div className="w-full max-w-xl mx-auto bg-card rounded-md shadow-sm border border-card-border p-8 sm:p-12 text-center animate-in fade-in zoom-in-95 duration-500">
       <div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-6">
@@ -27,6 +31,24 @@ export function OrderSuccess({ trackingNumber }: OrderSuccessProps) {
           {trackingNumber}
         </span>
       </div>
+
+      {totalPrice !== null && (
+        <div className="mb-8 p-4 rounded-md border border-border bg-muted/30">
+          <div className="flex justify-between text-sm mb-2">
+            <span className="text-muted-foreground">سعر الكتاب</span>
+            <span>{BOOK_PRICE.toLocaleString("ar-DZ")} د.ج</span>
+          </div>
+          <div className="flex justify-between text-sm mb-2">
+            <span className="text-muted-foreground">سعر التوصيل</span>
+            <span>{deliveryPrice?.toLocaleString("ar-DZ")} د.ج</span>
+          </div>
+          <div className="h-px bg-border mb-2" />
+          <div className="flex justify-between font-bold text-foreground">
+            <span>المجموع</span>
+            <span>{totalPrice.toLocaleString("ar-DZ")} د.ج</span>
+          </div>
+        </div>
+      )}
 
       <p className="text-sm text-muted-foreground font-serif italic">
         "الكلمات الأخيرة لا تضيع، بل تجد من يحملها."

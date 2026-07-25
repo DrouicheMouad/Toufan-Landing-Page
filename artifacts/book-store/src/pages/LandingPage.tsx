@@ -5,6 +5,7 @@ import { OrderSuccess } from "@/components/OrderSuccess"
 
 export default function LandingPage() {
   const [trackingNumber, setTrackingNumber] = useState<string | null>(null)
+  const [deliveryPrice, setDeliveryPrice] = useState<number | null>(null)
 
   return (
     <div className="min-h-screen bg-background text-foreground relative selection:bg-primary selection:text-primary-foreground">
@@ -20,10 +21,13 @@ export default function LandingPage() {
           <div className="absolute left-1/2 -top-10 md:-top-16 w-px h-12 md:h-20 bg-gradient-to-b from-transparent via-border to-transparent -translate-x-1/2"></div>
           
           {trackingNumber ? (
-            <OrderSuccess trackingNumber={trackingNumber} />
+            <OrderSuccess trackingNumber={trackingNumber} deliveryPrice={deliveryPrice ?? undefined} />
           ) : (
             <div className="animate-in fade-in duration-700 delay-300 fill-mode-both">
-              <OrderForm onSuccess={setTrackingNumber} />
+              <OrderForm onSuccess={(tracking, price) => {
+                setTrackingNumber(tracking)
+                setDeliveryPrice(price)
+              }} />
             </div>
           )}
         </div>

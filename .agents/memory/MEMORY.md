@@ -1,0 +1,2 @@
+- [Guepex API filter behavior](guepex-api-filters.md) — `is_deliverable` is returned but not accepted as a query filter; filter server-side.
+- [TanStack Query 5 + Orval queryKey](tanstack-query-orval-querykey.md) — generated hooks need `queryKey` in the `query` option when using `enabled`.

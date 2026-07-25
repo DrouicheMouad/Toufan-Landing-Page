@@ -6,8 +6,11 @@ import {
   useGetWilayas, 
   useGetCommunes, 
   useGetCenters, 
-  useCreateOrder 
+  useCreateOrder,
+  getGetCommunesQueryKey,
+  getGetCentersQueryKey
 } from "@workspace/api-client-react"
+import { BOOK_PRICE, getDeliveryPrice } from "@workspace/api-zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -43,7 +46,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 interface OrderFormProps {
-  onSuccess: (tracking: string) => void;
+  onSuccess: (tracking: string, deliveryPrice: number) => void;
 }
 
 export function OrderForm({ onSuccess }: OrderFormProps) {
@@ -67,16 +70,21 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
   const { data: wilayas = [], isLoading: loadingWilayas } = useGetWilayas()
   const { data: communes = [], isLoading: loadingCommunes } = useGetCommunes(
     { wilaya_id: Number(watchWilayaId) },
-    { query: { enabled: !!watchWilayaId } }
+    { query: { queryKey: getGetCommunesQueryKey({ wilaya_id: Number(watchWilayaId) }), enabled: !!watchWilayaId } }
   )
   const { data: centers = [], isLoading: loadingCenters } = useGetCenters(
     { wilaya_id: Number(watchWilayaId) },
-    { query: { enabled: !!watchWilayaId && watchIsStopdesk === "stopdesk" } }
+    { query: { queryKey: getGetCentersQueryKey({ wilaya_id: Number(watchWilayaId) }), enabled: !!watchWilayaId && watchIsStopdesk === "stopdesk" } }
   )
 
   const createOrder = useCreateOrder()
 
   const [formError, setFormError] = React.useState<string | null>(null)
+
+  const selectedWilaya = wilayas.find(w => w.id === Number(watchWilayaId))
+  const isStopdesk = watchIsStopdesk === "stopdesk"
+  const deliveryPrice = selectedWilaya ? getDeliveryPrice(selectedWilaya.name, isStopdesk) : 0
+  const totalPrice = BOOK_PRICE + deliveryPrice
 
   function onSubmit(data: FormValues) {
     setFormError(null)
@@ -85,6 +93,8 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
     const commune = communes.find(c => c.id === Number(data.commune_id))
 
     if (!wilaya || !commune) return
+
+    const orderDeliveryPrice = getDeliveryPrice(wilaya.name, data.is_stopdesk === "stopdesk")
 
     createOrder.mutate({
       data: {
@@ -95,12 +105,13 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
         to_commune_name: commune.name,
         is_stopdesk: data.is_stopdesk === "stopdesk",
         address: data.is_stopdesk === "home" ? data.address : null,
-        stopdesk_id: data.is_stopdesk === "stopdesk" && data.stopdesk_id ? Number(data.stopdesk_id) : null
+        stopdesk_id: data.is_stopdesk === "stopdesk" && data.stopdesk_id ? Number(data.stopdesk_id) : null,
+        delivery_price: orderDeliveryPrice
       }
     }, {
       onSuccess: (res) => {
         if (res.success && res.tracking) {
-          onSuccess(res.tracking)
+          onSuccess(res.tracking, orderDeliveryPrice)
         } else {
           setFormError(res.message || "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.")
         }
@@ -111,9 +122,6 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
     })
   }
 
-  // Filter out non-deliverable if needed, but API usually handles it.
-  // We'll show all returned.
-  
   return (
     <div className="w-full max-w-xl mx-auto bg-card rounded-md shadow-sm border border-card-border p-6 sm:p-10 relative overflow-hidden">
       
@@ -318,12 +326,30 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
             />
           )}
 
+          {selectedWilaya && (
+            <div className="p-4 rounded-md border border-border bg-muted/30 space-y-2 animate-in fade-in slide-in-from-top-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">سعر الكتاب</span>
+                <span className="font-medium">{BOOK_PRICE.toLocaleString("ar-DZ")} د.ج</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">سعر التوصيل ({isStopdesk ? "مكتب" : "للمنزل"})</span>
+                <span className="font-medium">{deliveryPrice.toLocaleString("ar-DZ")} د.ج</span>
+              </div>
+              <div className="h-px bg-border" />
+              <div className="flex justify-between font-bold text-foreground">
+                <span>المجموع</span>
+                <span>{totalPrice.toLocaleString("ar-DZ")} د.ج</span>
+              </div>
+            </div>
+          )}
+
           <Button 
             type="submit" 
             className="w-full h-14 text-lg font-serif tracking-wide bg-foreground text-background hover:bg-foreground/90 mt-8"
             disabled={createOrder.isPending}
           >
-            {createOrder.isPending ? "جاري الإرسال..." : "تأكيد الطلب"}
+            {createOrder.isPending ? "جاري الإرسال..." : `تأكيد الطلب — ${selectedWilaya ? totalPrice.toLocaleString("ar-DZ") : "1200"} د.ج`}
           </Button>
 
         </form>

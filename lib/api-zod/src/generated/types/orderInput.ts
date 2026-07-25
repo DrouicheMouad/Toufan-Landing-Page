@@ -20,4 +20,6 @@ export interface OrderInput {
   is_stopdesk: boolean;
   /** @nullable */
   stopdesk_id?: number | null;
+  /** @minimum 0 */
+  delivery_price: number;
 }

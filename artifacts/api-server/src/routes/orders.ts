@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import nodemailer from "nodemailer";
-import { CreateOrderBody, CreateOrderResponse } from "@workspace/api-zod";
+import { BOOK_PRICE, CreateOrderBody, CreateOrderResponse, getDeliveryPrice } from "@workspace/api-zod";
 import { db, ordersTable } from "@workspace/db";
 import { logger } from "../lib/logger";
 
@@ -8,7 +8,6 @@ const router: IRouter = Router();
 
 const GUEPEX_BASE = "https://api.guepex.app/v1";
 const BOOK_NAME = "تحت راية الطوفان";
-const BOOK_PRICE = 1200;
 const FROM_WILAYA = "Sidi Bel Abèss";
 const SELLER_EMAIL = "mouaddrouiche22@gmail.com";
 
@@ -73,6 +72,8 @@ router.post("/orders", async (req, res): Promise<void> => {
   }
 
   const body = parsed.data;
+  const deliveryPrice = getDeliveryPrice(body.to_wilaya_name, body.is_stopdesk);
+  const totalPrice = BOOK_PRICE + deliveryPrice;
 
   // Build unique order_id
   const orderId = `book-${Date.now()}`;
@@ -148,6 +149,7 @@ router.post("/orders", async (req, res): Promise<void> => {
       is_stopdesk: body.is_stopdesk,
       stopdesk_id: body.stopdesk_id ?? null,
       address: body.address ?? null,
+      delivery_price: deliveryPrice,
       success,
       error_message: errorMessage,
     });
@@ -159,7 +161,7 @@ router.post("/orders", async (req, res): Promise<void> => {
   const customerName = `${body.firstname} ${body.familyname}`;
   const deliveryType = body.is_stopdesk ? "سحب من مكتب" : "توصيل للباب";
   const notifMessage = success
-    ? `📦 طلب جديد!\n\nالعميل: ${customerName}\nالهاتف: ${body.contact_phone}\nالولاية: ${body.to_wilaya_name}\nالبلدية: ${body.to_commune_name}\nالتوصيل: ${deliveryType}\nالتتبع: ${tracking}\nالسعر: ${BOOK_PRICE} DA`
+    ? `📦 طلب جديد!\n\nالعميل: ${customerName}\nالهاتف: ${body.contact_phone}\nالولاية: ${body.to_wilaya_name}\nالبلدية: ${body.to_commune_name}\nالتوصيل: ${deliveryType}\nالتتبع: ${tracking}\nسعر الكتاب: ${BOOK_PRICE} DA\nسعر التوصيل: ${deliveryPrice} DA\nالمجموع: ${totalPrice} DA`
     : `⚠️ طلب فاشل!\n\nالعميل: ${customerName}\nالهاتف: ${body.contact_phone}\nالولاية: ${body.to_wilaya_name}\nالخطأ: ${errorMessage}`;
 
   const emailHtml = success
@@ -172,7 +174,9 @@ router.post("/orders", async (req, res): Promise<void> => {
          <tr><td><b>التوصيل</b></td><td>${deliveryType}</td></tr>
          ${body.address ? `<tr><td><b>العنوان</b></td><td>${body.address}</td></tr>` : ""}
          <tr><td><b>رقم التتبع</b></td><td><b style="color:#2563eb">${tracking}</b></td></tr>
-         <tr><td><b>السعر</b></td><td>${BOOK_PRICE} DA</td></tr>
+         <tr><td><b>سعر الكتاب</b></td><td>${BOOK_PRICE} DA</td></tr>
+         <tr><td><b>سعر التوصيل</b></td><td>${deliveryPrice} DA</td></tr>
+         <tr><td><b>المجموع</b></td><td><b style="color:#2563eb">${totalPrice} DA</b></td></tr>
        </table>
        <p style="margin-top:16px"><a href="${label}" style="color:#2563eb">عرض بطاقة التوصيل</a></p>`
     : `<h2>⚠️ طلب فاشل — ${BOOK_NAME}</h2>
