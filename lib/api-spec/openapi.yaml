@@ -3,13 +3,17 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: API specification for book order landing page
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: guepex
+    description: Guepex delivery data
+  - name: orders
+    description: Order creation
 paths:
   /healthz:
     get:
@@ -24,6 +28,129 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /wilayas:
+    get:
+      operationId: getWilayas
+      tags: [guepex]
+      summary: Get all deliverable wilayas
+      description: Returns the list of wilayas from Guepex
+      responses:
+        "200":
+          description: List of wilayas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Wilaya"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /communes:
+    get:
+      operationId: getCommunes
+      tags: [guepex]
+      summary: Get communes for a wilaya
+      description: Returns deliverable communes filtered by wilaya_id
+      parameters:
+        - name: wilaya_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of communes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Commune"
+        "400":
+          description: Missing wilaya_id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /centers:
+    get:
+      operationId: getCenters
+      tags: [guepex]
+      summary: Get stop desk centers for a wilaya
+      description: Returns stop desk centers filtered by wilaya_id
+      parameters:
+        - name: wilaya_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of centers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Center"
+        "400":
+          description: Missing wilaya_id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /orders:
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Create a book order via Guepex
+      description: Creates a Guepex delivery parcel and sends notifications to the seller
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +161,99 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    Wilaya:
+      type: object
+      required: [id, name, zone, is_deliverable]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        zone:
+          type: integer
+        is_deliverable:
+          type: integer
+
+    Commune:
+      type: object
+      required: [id, name, wilaya_id, has_stop_desk, is_deliverable]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        wilaya_id:
+          type: integer
+        wilaya_name:
+          type: string
+        has_stop_desk:
+          type: integer
+        is_deliverable:
+          type: integer
+
+    Center:
+      type: object
+      required: [center_id, name]
+      properties:
+        center_id:
+          type: integer
+        name:
+          type: string
+        commune_id:
+          type: integer
+        commune_name:
+          type: string
+        wilaya_id:
+          type: integer
+        wilaya_name:
+          type: string
+
+    OrderInput:
+      type: object
+      required:
+        - firstname
+        - familyname
+        - contact_phone
+        - to_wilaya_name
+        - to_commune_name
+        - is_stopdesk
+      properties:
+        firstname:
+          type: string
+          minLength: 1
+        familyname:
+          type: string
+          minLength: 1
+        contact_phone:
+          type: string
+          minLength: 9
+        address:
+          type: ["string", "null"]
+        to_wilaya_name:
+          type: string
+        to_commune_name:
+          type: string
+        is_stopdesk:
+          type: boolean
+        stopdesk_id:
+          type: ["integer", "null"]
+
+    OrderResult:
+      type: object
+      required: [success, tracking]
+      properties:
+        success:
+          type: boolean
+        tracking:
+          type: ["string", "null"]
+        label:
+          type: ["string", "null"]
+        message:
+          type: ["string", "null"]
