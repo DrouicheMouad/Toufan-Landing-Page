@@ -32,9 +32,6 @@ export function BookShowcase() {
 
       {/* Book Info */}
       <div className="text-center md:text-right max-w-lg shrink">
-        <div className="inline-block border border-primary/30 text-primary px-3 py-1 text-xs tracking-widest mb-6 font-serif">
-          الإصدار الأخير
-        </div>
         
         <h1 className="text-5xl md:text-7xl font-serif font-bold text-foreground mb-6 leading-tight">
           تحت راية<br/>الطوفان
