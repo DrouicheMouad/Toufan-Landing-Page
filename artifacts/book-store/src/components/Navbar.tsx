@@ -24,9 +24,7 @@ export function Navbar() {
     >
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
         {/* Site name / logo */}
-        <span className="font-serif text-base font-bold text-foreground tracking-wide select-none">
-          تحت راية الطوفان
-        </span>
+        <span className="font-serif text-base font-bold text-foreground tracking-wide select-none">مكتبة الأمداد</span>
 
         {/* Nav links */}
         <nav className="flex items-center gap-1 sm:gap-2">
@@ -45,5 +43,5 @@ export function Navbar() {
         </nav>
       </div>
     </header>
-  )
+  );
 }
