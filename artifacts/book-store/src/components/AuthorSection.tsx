@@ -40,7 +40,7 @@ export function AuthorSection() {
             </div>
           </div>
           <div className="text-center md:text-right">
-            <span className="text-xs tracking-widest text-primary/80 uppercase font-serif mb-3 block">نبذة عن الكاتب</span>
+            <span className="text-xs tracking-widest text-primary/80 uppercase font-serif mb-3 block">تعرف على الكاتب</span>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">اسم الكاتب</h2>
             <p className="text-lg text-muted-foreground leading-relaxed font-serif max-w-xl">
               كاتب وشاعر جزائري، عاش بين أصوات المدينة وهدوء الريف. كتابته انفعال بالذاكرة والمكان،
