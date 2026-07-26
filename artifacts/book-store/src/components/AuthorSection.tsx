@@ -11,6 +11,27 @@ const staggerContainer = {
   visible: { transition: { staggerChildren: 0.15 } }
 }
 
+const mediaItems = [
+  {
+    type: "video" as const,
+    src: `${import.meta.env.BASE_URL}media/video1.mp4`,
+    title: "من وصايا الشهيد -رحمه الله وتقبله",
+    caption: "اقرؤوا القرآن في بيوتكم، فالبيت الذي يُقرأ فيه القرآن ليس كغيره",
+  },
+  {
+    type: "video" as const,
+    src: `${import.meta.env.BASE_URL}media/video2.mp4`,
+    title: "تلاوة عطرة من سورة فصلت",
+    caption: "تلاوة من آيات الذكر الحكيم",
+  },
+  {
+    type: "video" as const,
+    src: `${import.meta.env.BASE_URL}media/video3.mp4`,
+    title: "الشهيد محمد زكي حمد -رحمه الله وتقبله- ينشد مع أولاده",
+    caption: "لحظات من الفرح والإنشاد مع أطفاله",
+  },
+]
+
 const pressOutlets = [
   {
     name: "الجزيرة نت",
@@ -146,44 +167,41 @@ export function AuthorSection() {
           </div>
         </motion.div>
 
-        {/* Photos & Video */}
+        {/* Videos */}
         <motion.div variants={fadeInUp}>
           <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">صور وفيديوهات</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mediaItems.map((item, idx) => (
               <div
-                key={i}
+                key={idx}
                 className="group relative aspect-square overflow-hidden rounded-md border border-card-border bg-muted"
               >
-                <img
-                  src={`${import.meta.env.BASE_URL}book_cover.jpg`}
-                  alt={`صورة ${i}`}
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                <video
+                  src={item.src}
+                  preload="metadata"
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
+                  poster={`${import.meta.env.BASE_URL}book_cover.jpg`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-500" />
-              </div>
-            ))}
-            <div className="relative aspect-video sm:aspect-square overflow-hidden rounded-md border border-card-border bg-muted group sm:col-span-2 lg:col-span-2">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"
-                poster={`${import.meta.env.BASE_URL}book_cover.jpg`}
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-foreground ml-1">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-foreground ml-1">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                  <h4 className="text-sm font-bold text-white mb-1">{item.title}</h4>
+                  <p className="text-xs text-white/80 leading-snug">{item.caption}</p>
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
-                <span className="text-xs text-white/90 font-medium">لقطات من الكتاب</span>
-              </div>
-            </div>
+            ))}
           </div>
+          <p className="text-sm text-muted-foreground mt-4 text-center md:text-right font-serif">
+            اضغط على أي فيديو لتشغيله.
+          </p>
         </motion.div>
       </motion.div>
     </section>
