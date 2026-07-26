@@ -209,9 +209,6 @@ export function AuthorSection() {
               </div>
             ))}
           </div>
-          <p className="text-sm text-muted-foreground mt-4 text-center md:text-right font-serif">
-            صور من حياة الشهيد ومسيرته الجهادية.
-          </p>
         </motion.div>
       </motion.div>
     </section>
