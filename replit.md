@@ -1,6 +1,6 @@
-# [Project name]
+# تحت راية الطوفان — Book Order
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A book order landing page for "تحت راية الطوفان" that lets customers place delivery orders via the Guepex courier API, with seller notifications via Telegram and email.
 
 ## Run & Operate
 
@@ -9,7 +9,11 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `DATABASE_URL` — Postgres connection string (pre-configured)
+- Required env: `GUEPEX_API_ID` — Guepex courier API ID
+- Required env: `GUEPEX_API_TOKEN` — Guepex courier API token
+- Optional env: `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` — order notifications via Telegram
+- Optional env: `GMAIL_APP_PASSWORD` — order notifications via email (sender: mouaddrouiche22@gmail.com)
 
 ## Stack
 
@@ -22,7 +26,12 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/book-store/` — React + Vite frontend (landing page + order form)
+- `artifacts/api-server/` — Express 5 backend (Guepex routes, order creation, notifications)
+- `lib/api-spec/openapi.yaml` — OpenAPI spec (source of truth for all API contracts)
+- `lib/api-client-react/` — generated React Query hooks (do not edit by hand)
+- `lib/api-zod/` — generated Zod schemas used by the server (do not edit by hand)
+- `lib/db/src/schema/orders.ts` — Drizzle DB schema
 
 ## Architecture decisions
 
