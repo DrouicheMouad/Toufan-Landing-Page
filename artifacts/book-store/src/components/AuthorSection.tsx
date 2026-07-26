@@ -52,7 +52,7 @@ export function AuthorSection() {
         {/* Story */}
         <motion.div variants={fadeInUp} className="bg-card border border-card-border rounded-md p-6 md:p-10 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-1 bg-primary" />
-          <h3 className="text-2xl font-serif font-bold text-foreground mb-4">قصته</h3>
+          <h3 className="text-2xl font-serif font-bold text-foreground mb-4">نبذة عن حياته</h3>
           <div className="prose prose-lg max-w-none text-muted-foreground font-serif leading-relaxed">
             <p>
               بدأ الكتابة في سنوات مبكرة، ملاحظاً تفاصيل لا يلتفت إليها أحد. مرّ بمحطات صعبة تركت فيه
@@ -70,7 +70,7 @@ export function AuthorSection() {
 
         {/* Press */}
         <motion.div variants={fadeInUp}>
-          <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">كما تحدثت عنه الصحافة</h3>
+          <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">مقالات عنه</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {pressOutlets.map((outlet) => (
               <div
@@ -130,5 +130,5 @@ export function AuthorSection() {
         </motion.div>
       </motion.div>
     </section>
-  )
+  );
 }
