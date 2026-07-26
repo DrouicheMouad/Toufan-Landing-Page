@@ -21,7 +21,7 @@ import { AlertCircle } from "lucide-react"
 const formSchema = z.object({
   firstname: z.string().min(1, "الاسم مطلوب"),
   familyname: z.string().min(1, "اللقب مطلوب"),
-  contact_phone: z.string().min(9, "رقم الهاتف يجب أن يتكون من 9 أرقام على الأقل"),
+  contact_phone: z.string().regex(/^(\+?213\s*|0\s*)?\s*[5-7](\s*[0-9]){8}\s*$/, "رقم هاتف جزائري غير صالح (مثال: 0550123456)"),
   wilaya_id: z.string().min(1, "الولاية مطلوبة"),
   commune_id: z.string().min(1, "البلدية مطلوبة"),
   is_stopdesk: z.enum(["home", "stopdesk"]),

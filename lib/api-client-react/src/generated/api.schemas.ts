@@ -43,7 +43,11 @@ export interface OrderInput {
   firstname: string;
   /** @minLength 1 */
   familyname: string;
-  /** @minLength 9 */
+  /**
+     * @minLength 9
+     * @maxLength 17
+     * @pattern ^(\+?213\s*|0\s*)?\s*[5-7](\s*[0-9]){8}\s*$
+     */
   contact_phone: string;
   /** @nullable */
   address?: string | null;

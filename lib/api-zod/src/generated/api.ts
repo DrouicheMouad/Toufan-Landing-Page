@@ -75,7 +75,10 @@ export const GetCentersResponse = zod.array(GetCentersResponseItem)
 
 
 export const createOrderBodyContactPhoneMin = 9;
+export const createOrderBodyContactPhoneMax = 17;
 
+
+export const createOrderBodyContactPhoneRegExp = new RegExp('^(\\+?213\\s*|0\\s*)?\\s*[5-7](\\s*[0-9]){8}\\s*$');
 export const createOrderBodyDeliveryPriceMin = 0;
 
 
@@ -83,7 +86,7 @@ export const createOrderBodyDeliveryPriceMin = 0;
 export const CreateOrderBody = zod.object({
   "firstname": zod.string().min(1),
   "familyname": zod.string().min(1),
-  "contact_phone": zod.string().min(createOrderBodyContactPhoneMin),
+  "contact_phone": zod.string().min(createOrderBodyContactPhoneMin).max(createOrderBodyContactPhoneMax).regex(createOrderBodyContactPhoneRegExp),
   "address": zod.string().nullish(),
   "to_wilaya_name": zod.string(),
   "to_commune_name": zod.string(),

@@ -235,6 +235,8 @@ components:
         contact_phone:
           type: string
           minLength: 9
+          maxLength: 17
+          pattern: "^(\\+?213\\s*|0\\s*)?\\s*[5-7](\\s*[0-9]){8}\\s*$"
         address:
           type: ["string", "null"]
         to_wilaya_name:

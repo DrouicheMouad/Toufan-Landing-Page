@@ -11,6 +11,17 @@ const BOOK_NAME = "تحت راية الطوفان";
 const FROM_WILAYA = "Sidi Bel Abbès";
 const SELLER_EMAIL = "mouaddrouiche22@gmail.com";
 
+function normalizePhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  // 9 digits starting with 5-7 → add leading 0
+  if (/^[5-7][0-9]{8}$/.test(digits)) return `0${digits}`;
+  // 12 digits starting with 213 → strip country code and add 0
+  if (/^213[5-7][0-9]{8}$/.test(digits)) return `0${digits.slice(3)}`;
+  // 10 digits starting with 0 → keep as is
+  if (/^0[5-7][0-9]{8}$/.test(digits)) return digits;
+  return digits;
+}
+
 function guepexHeaders() {
   return {
     "X-API-ID": process.env.GUEPEX_API_ID ?? "",
@@ -72,6 +83,7 @@ router.post("/orders", async (req, res): Promise<void> => {
   }
 
   const body = parsed.data;
+  const normalizedPhone = normalizePhone(body.contact_phone);
   const deliveryPrice = getDeliveryPrice(body.to_wilaya_name, body.is_stopdesk);
   const totalPrice = BOOK_PRICE + deliveryPrice;
 
@@ -85,7 +97,7 @@ router.post("/orders", async (req, res): Promise<void> => {
       from_wilaya_name: FROM_WILAYA,
       firstname: body.firstname,
       familyname: body.familyname,
-      contact_phone: body.contact_phone,
+      contact_phone: normalizedPhone,
       address: body.address ?? "غير محدد",
       to_wilaya_name: body.to_wilaya_name,
       to_commune_name: body.to_commune_name,
@@ -143,7 +155,7 @@ router.post("/orders", async (req, res): Promise<void> => {
       tracking,
       firstname: body.firstname,
       familyname: body.familyname,
-      contact_phone: body.contact_phone,
+      contact_phone: normalizedPhone,
       to_wilaya_name: body.to_wilaya_name,
       to_commune_name: body.to_commune_name,
       is_stopdesk: body.is_stopdesk,
@@ -161,14 +173,14 @@ router.post("/orders", async (req, res): Promise<void> => {
   const customerName = `${body.firstname} ${body.familyname}`;
   const deliveryType = body.is_stopdesk ? "سحب من مكتب" : "توصيل للباب";
   const notifMessage = success
-    ? `📦 طلب جديد!\n\nالعميل: ${customerName}\nالهاتف: ${body.contact_phone}\nالولاية: ${body.to_wilaya_name}\nالبلدية: ${body.to_commune_name}\nالتوصيل: ${deliveryType}\nالتتبع: ${tracking}\nسعر الكتاب: ${BOOK_PRICE} DA\nسعر التوصيل: ${deliveryPrice} DA\nالمجموع: ${totalPrice} DA`
-    : `⚠️ طلب فاشل!\n\nالعميل: ${customerName}\nالهاتف: ${body.contact_phone}\nالولاية: ${body.to_wilaya_name}\nالخطأ: ${errorMessage}`;
+    ? `📦 طلب جديد!\n\nالعميل: ${customerName}\nالهاتف: ${normalizedPhone}\nالولاية: ${body.to_wilaya_name}\nالبلدية: ${body.to_commune_name}\nالتوصيل: ${deliveryType}\nالتتبع: ${tracking}\nسعر الكتاب: ${BOOK_PRICE} DA\nسعر التوصيل: ${deliveryPrice} DA\nالمجموع: ${totalPrice} DA`
+    : `⚠️ طلب فاشل!\n\nالعميل: ${customerName}\nالهاتف: ${normalizedPhone}\nالولاية: ${body.to_wilaya_name}\nالخطأ: ${errorMessage}`;
 
   const emailHtml = success
     ? `<h2>طلب جديد — ${BOOK_NAME}</h2>
        <table border="0" cellpadding="8" style="font-family:sans-serif;font-size:14px">
          <tr><td><b>العميل</b></td><td>${customerName}</td></tr>
-         <tr><td><b>الهاتف</b></td><td>${body.contact_phone}</td></tr>
+         <tr><td><b>الهاتف</b></td><td>${normalizedPhone}</td></tr>
          <tr><td><b>الولاية</b></td><td>${body.to_wilaya_name}</td></tr>
          <tr><td><b>البلدية</b></td><td>${body.to_commune_name}</td></tr>
          <tr><td><b>التوصيل</b></td><td>${deliveryType}</td></tr>
@@ -180,7 +192,7 @@ router.post("/orders", async (req, res): Promise<void> => {
        </table>
        <p style="margin-top:16px"><a href="${label}" style="color:#2563eb">عرض بطاقة التوصيل</a></p>`
     : `<h2>⚠️ طلب فاشل — ${BOOK_NAME}</h2>
-       <p>العميل: ${customerName} — ${body.contact_phone}</p>
+       <p>العميل: ${customerName} — ${normalizedPhone}</p>
        <p>الخطأ: ${errorMessage}</p>`;
 
   // Don't await notifications — respond to customer first
