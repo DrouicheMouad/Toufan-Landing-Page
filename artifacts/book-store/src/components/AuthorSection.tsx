@@ -1,5 +1,10 @@
 import React from "react"
 import { motion } from "framer-motion"
+import pic1 from "@assets/1_1785100860754.jpg"
+import pic2 from "@assets/2_1785101007279.jpg"
+import pic3 from "@assets/2_1785101177198.jpeg"
+import pic4 from "@assets/5_1785101184164.jpg"
+import pic5 from "@assets/just_enhance_quality_2K_202607260333_1785101228180.jpeg"
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -13,22 +18,34 @@ const staggerContainer = {
 
 const mediaItems = [
   {
-    type: "video" as const,
-    src: `${import.meta.env.BASE_URL}media/video1.mp4`,
-    title: "من وصايا الشهيد -رحمه الله وتقبله",
-    caption: "اقرؤوا القرآن في بيوتكم، فالبيت الذي يُقرأ فيه القرآن ليس كغيره",
+    type: "image" as const,
+    src: pic1,
+    title: "صورة الشهيد محمد زكي حمد بزيه العسكري في ليالي الرباط وميادين الإعداد",
+    caption: "",
   },
   {
-    type: "video" as const,
-    src: `${import.meta.env.BASE_URL}media/video2.mp4`,
-    title: "تلاوة عطرة من سورة فصلت",
-    caption: "تلاوة من آيات الذكر الحكيم",
+    type: "image" as const,
+    src: pic2,
+    title: "الشهيد محمد زكي حمد في أحد الأنفاق التي تم ترميمها بالأخشاب في الحرب",
+    caption: "",
   },
   {
-    type: "video" as const,
-    src: `${import.meta.env.BASE_URL}media/video3.mp4`,
-    title: "الشهيد محمد زكي حمد -رحمه الله وتقبله- ينشد مع أولاده",
-    caption: "لحظات من الفرح والإنشاد مع أطفاله",
+    type: "image" as const,
+    src: pic3,
+    title: "أربعة شهداء أقمار، كل واحد منهم بألف بل أكثر",
+    caption: "",
+  },
+  {
+    type: "image" as const,
+    src: pic4,
+    title: "صورة للشهيد محمد زكي حمد، صاحب كتاب (تحت راية الطوفان) أثناء التصدي للعدو الصهيوني في معركة طوفان الأقصى",
+    caption: "",
+  },
+  {
+    type: "image" as const,
+    src: pic5,
+    title: "مساهمة الشهيد رحمه الله في مشروع صفوة الحفاظ",
+    caption: "",
   },
 ]
 
@@ -167,40 +184,32 @@ export function AuthorSection() {
           </div>
         </motion.div>
 
-        {/* Videos */}
+        {/* Photo gallery */}
         <motion.div variants={fadeInUp}>
-          <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">صور وفيديوهات</h3>
+          <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">معرض الصور</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {mediaItems.map((item, idx) => (
               <div
                 key={idx}
-                className="group relative aspect-square overflow-hidden rounded-md border border-card-border bg-muted"
+                className="group relative aspect-[3/4] overflow-hidden rounded-md border border-card-border bg-muted"
               >
-                <video
+                <img
                   src={item.src}
-                  preload="metadata"
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
-                  poster={`${import.meta.env.BASE_URL}book_cover.jpg`}
+                  alt={item.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-foreground ml-1">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                  <h4 className="text-sm font-bold text-white mb-1">{item.title}</h4>
-                  <p className="text-xs text-white/80 leading-snug">{item.caption}</p>
+                  <h4 className="text-sm font-bold text-white leading-snug">{item.title}</h4>
+                  {item.caption && (
+                    <p className="text-xs text-white/80 leading-snug mt-1">{item.caption}</p>
+                  )}
                 </div>
               </div>
             ))}
           </div>
           <p className="text-sm text-muted-foreground mt-4 text-center md:text-right font-serif">
-            اضغط على أي فيديو لتشغيله.
+            صور من حياة الشهيد ومسيرته الجهادية.
           </p>
         </motion.div>
       </motion.div>
