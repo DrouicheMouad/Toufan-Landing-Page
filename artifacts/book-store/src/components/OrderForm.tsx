@@ -81,7 +81,6 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
   const createOrder = useCreateOrder()
 
   const [formError, setFormError] = React.useState<string | null>(null)
-  const [pendingData, setPendingData] = React.useState<{ data: FormValues; deliveryPrice: number } | null>(null)
   const stopdeskSelectRef = React.useRef<HTMLButtonElement>(null)
 
   const selectedWilaya = wilayas.find(w => w.id === Number(watchWilayaId))
@@ -91,6 +90,8 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
   const deliveryPrice = selectedWilaya ? getDeliveryPrice(selectedWilaya.name, isStopdesk) : 0
   const totalPrice = BOOK_PRICE + deliveryPrice
 
+  const availableCenters = selectedCommune ? centers.filter(c => c.commune_id === selectedCommune.id) : []
+  const hasStopdeskInCommune = selectedCommune ? availableCenters.length > 0 : true
   const stopdeskInCommune = !selectedCenter || !selectedCommune || selectedCenter.commune_id === selectedCommune.id
 
   function submitOrder(data: FormValues, orderDeliveryPrice: number) {
@@ -133,27 +134,17 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
 
     if (!wilaya || !commune) return
 
-    const orderDeliveryPrice = getDeliveryPrice(wilaya.name, data.is_stopdesk === "stopdesk")
-
     const center = centers.find(c => c.center_id === Number(data.stopdesk_id))
-    const centerNotInCommune = data.is_stopdesk === "stopdesk" && center && commune && center.commune_id !== commune.id
-
-    if (centerNotInCommune) {
-      setPendingData({ data, deliveryPrice: orderDeliveryPrice })
+    if (data.is_stopdesk === "stopdesk" && center && center.commune_id !== commune.id) {
+      setFormError("المكتب المختار لا يقع في بلديتك. يرجى اختيار مكتب في بلديتك أو التوصيل للباب.")
       return
     }
 
+    const orderDeliveryPrice = getDeliveryPrice(wilaya.name, data.is_stopdesk === "stopdesk")
     submitOrder(data, orderDeliveryPrice)
   }
 
-  function confirmStopDeskAnyway() {
-    if (!pendingData) return
-    submitOrder(pendingData.data, pendingData.deliveryPrice)
-    setPendingData(null)
-  }
-
-  function changeStopDesk() {
-    setPendingData(null)
+  function clearStopDesk() {
     form.setValue("stopdesk_id", "")
     stopdeskSelectRef.current?.focus()
   }
@@ -174,37 +165,6 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
       {formError && (
         <div className="mb-6 p-4 rounded bg-destructive/10 text-destructive border border-destructive/20 text-sm">
           {formError}
-        </div>
-      )}
-
-      {pendingData && (
-        <div className="mb-6 p-4 rounded border border-amber-200 bg-amber-50 text-amber-900 dark:bg-amber-950/30 dark:text-amber-100 dark:border-amber-900/50 text-sm">
-          <div className="flex items-start gap-3 mb-3">
-            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-bold mb-1">المكتب المختار لا يقع في بلديتك</p>
-              <p className="opacity-90">
-                بعض الزبائن يفضلون استلام طلباتهم من مكتب بعيد. إذا كنت تريد ذلك، يمكنك التأكيد. وإلا اختر مكتباً في بلديتك.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1 border-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30"
-              onClick={changeStopDesk}
-            >
-              تغيير المكتب
-            </Button>
-            <Button
-              type="button"
-              className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
-              onClick={confirmStopDeskAnyway}
-            >
-              تأكيد على أي حال
-            </Button>
-          </div>
         </div>
       )}
 
@@ -266,7 +226,6 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
                     field.onChange(val)
                     form.setValue("commune_id", "")
                     form.setValue("stopdesk_id", "")
-                    setPendingData(null)
                   }} defaultValue={field.value} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -295,7 +254,6 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
                   <Select onValueChange={(val) => {
                     field.onChange(val)
                     form.setValue("stopdesk_id", "")
-                    setPendingData(null)
                   }} value={field.value} disabled={!watchWilayaId || loadingCommunes}>
                     <FormControl>
                       <SelectTrigger>
@@ -327,7 +285,6 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
                     onValueChange={(val) => {
                       field.onChange(val)
                       form.setValue("stopdesk_id", "")
-                      setPendingData(null)
                     }}
                     defaultValue={field.value}
                     className="flex flex-col space-y-1"
@@ -380,20 +337,19 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
                   <FormLabel>اختر المكتب</FormLabel>
                   <Select onValueChange={(val) => {
                     field.onChange(val)
-                    setPendingData(null)
-                  }} value={field.value} disabled={!watchWilayaId || loadingCenters}>
+                  }} value={field.value} disabled={!selectedCommune || loadingCenters}>
                     <FormControl>
                       <SelectTrigger ref={stopdeskSelectRef}>
-                        <SelectValue placeholder={!watchWilayaId ? "اختر الولاية أولاً" : loadingCenters ? "جاري التحميل..." : "اختر المكتب الأقرب إليك"} />
+                        <SelectValue placeholder={!selectedCommune ? "اختر البلدية أولاً" : loadingCenters ? "جاري التحميل..." : "اختر المكتب الأقرب إليك"} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {centers.length === 0 && watchWilayaId && !loadingCenters ? (
-                        <div className="p-4 text-center text-sm text-muted-foreground">لا تتوفر مكاتب في هذه الولاية</div>
+                      {selectedCommune && availableCenters.length === 0 && !loadingCenters ? (
+                        <div className="p-4 text-center text-sm text-muted-foreground">لا يوجد مكتب في هذه البلدية</div>
                       ) : (
-                        centers.map(c => (
+                        availableCenters.map(c => (
                           <SelectItem key={c.center_id} value={c.center_id.toString()}>
-                            {c.name} {c.commune_name ? `(${c.commune_name})` : ""}
+                            {c.name}
                           </SelectItem>
                         ))
                       )}
@@ -403,6 +359,12 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
                     <p className="text-xs text-amber-700 dark:text-amber-300 mt-2 flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
                       المكتب في {selectedCenter.commune_name} وليس في بلديتك ({selectedCommune.name})
+                    </p>
+                  )}
+                  {!hasStopdeskInCommune && selectedCommune && (
+                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      لا يوجد مكتب توصيل في هذه البلدية. يمكنك اختيار "توصيل للباب".
                     </p>
                   )}
                   <FormMessage />
@@ -432,7 +394,7 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
           <Button 
             type="submit" 
             className="w-full h-14 text-lg font-serif tracking-wide bg-foreground text-background hover:bg-foreground/90 mt-8"
-            disabled={createOrder.isPending || !!pendingData}
+            disabled={createOrder.isPending}
           >
             {createOrder.isPending ? "جاري الإرسال..." : `تأكيد الطلب — ${selectedWilaya ? totalPrice.toLocaleString("ar-DZ") : "1200"} د.ج`}
           </Button>
