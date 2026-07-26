@@ -149,7 +149,7 @@ export function AuthorSection() {
 
         {/* Press */}
         <motion.div variants={fadeInUp}>
-          <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">تغطيات إعلامية</h3>
+          <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">المقالات</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {pressOutlets.map((outlet) => (
               <a

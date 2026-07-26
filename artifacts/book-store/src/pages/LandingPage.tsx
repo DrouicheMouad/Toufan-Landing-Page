@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar"
 import { BookShowcase } from "@/components/BookShowcase"
 import { AuthorSection } from "@/components/AuthorSection"
 import { OrderCTA } from "@/components/OrderCTA"
+import { FooterCTA } from "@/components/FooterCTA"
 import { OrderForm } from "@/components/OrderForm"
 import { OrderSuccess } from "@/components/OrderSuccess"
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp"
@@ -36,12 +37,7 @@ export default function LandingPage() {
 
         {/* CTA #2 — after author section, before order form */}
         <div className="my-16 md:my-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <OrderCTA
-            headline="هل أثارك ما قرأت؟ النسخ في طريقها للنفاد"
-            subline="لا تنتظر كثيراً — اطلب نسختك الآن قبل أن تنتهي الكمية المتاحة."
-            buttonLabel="اطلب نسختك الآن"
-            variant="light"
-          />
+          <OrderCTA />
         </div>
 
         {/* 3) Order form */}
@@ -63,12 +59,7 @@ export default function LandingPage() {
 
         {/* CTA #3 — very bottom, dark variant for contrast */}
         <div className="mt-20 md:mt-28 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <OrderCTA
-            headline="الفصل الأخير يستحق أن يكون في مكتبتك"
-            subline="آخر الفرص — اطلب نسختك من «تحت راية الطوفان» قبل نفاد الكمية."
-            buttonLabel="اطلب الآن — التوصيل لجميع الولايات"
-            variant="dark"
-          />
+          <FooterCTA />
         </div>
       </main>
 
