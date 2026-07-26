@@ -1,0 +1,14 @@
+first change is that when I client choose a stop desk that is not in their common the system refuses the confirmation but since sompe ppl rather transefring to a further stop desk using taxi or bus or even their own cars, we'll notify em (just in case they haven't noticed) and then we'll give me the choice to confirm or change the information second change, the the bottom of the pic ain't showing, it's a bit not well fitting, so fix this, and also make a hover effect when coming on it with the mouse third change, when the client confirm their and add a direct link to my whatsap acc +213563289607 تواصلوا معنا على الواتساب other changes
+
+HERO SECTION — ADD BIG HOOK BUTTON
+Add one large, prominent button inside/near the hero image area (book cover with the "نسخ أصلية" ribbon), positioned as the primary visual hook — the first thing the eye lands on after the price block.
+Button text: "النسخ محدودة جدا، اطلب الآن"
+This button both signals scarcity AND acts as the first CTA — it should scroll/link to the order form.
+Style: high contrast, stands out from the beige/gold hero background (e.g. solid maroon/red background, white bold text).
+AUTHOR SECTION (NEW) — place after the hero section, before the order form
+Sub-section "نبذة عن الكاتب": author photo + name + 2-3 line hook introducing him.
+Sub-section "قصته": 3-5 sentences on his story, written to tie back naturally to the book.
+Sub-section "كما تحدثت عنه الصحافة": press/media mentions — outlet name/logo + one short paraphrased line per outlet (no long direct quotes).
+Sub-section "صور وفيديوهات": small photo gallery, or one short muted looping video card (NOT a full-page video background) alongside/instead of it.
+Visual treatment for images in this section: dark gradient overlay behind any text-over-image areas, or a duotone color treatment (tinted to match the maroon/cream palette) — for readability and visual cohesion.
+Effects: images fade in + slide up as the user scrolls to this section; author photo/gallery images shift from grayscale to full color on hover.

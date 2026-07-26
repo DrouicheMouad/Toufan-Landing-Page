@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { BookShowcase } from "@/components/BookShowcase"
+import { AuthorSection } from "@/components/AuthorSection"
 import { OrderForm } from "@/components/OrderForm"
 import { OrderSuccess } from "@/components/OrderSuccess"
 
@@ -15,6 +16,8 @@ export default function LandingPage() {
 
       <main className="container mx-auto px-4 py-16 md:py-24 relative z-10">
         <BookShowcase />
+
+        <AuthorSection />
 
         <div className="mt-20 md:mt-32 relative" id="order-section">
           {/* subtle separator */}

@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { AlertCircle } from "lucide-react"
 
 const formSchema = z.object({
   firstname: z.string().min(1, "الاسم مطلوب"),
@@ -80,21 +81,23 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
   const createOrder = useCreateOrder()
 
   const [formError, setFormError] = React.useState<string | null>(null)
+  const [pendingData, setPendingData] = React.useState<{ data: FormValues; deliveryPrice: number } | null>(null)
+  const stopdeskSelectRef = React.useRef<HTMLButtonElement>(null)
 
   const selectedWilaya = wilayas.find(w => w.id === Number(watchWilayaId))
+  const selectedCommune = communes.find(c => c.id === Number(form.watch("commune_id")))
+  const selectedCenter = centers.find(c => c.center_id === Number(form.watch("stopdesk_id")))
   const isStopdesk = watchIsStopdesk === "stopdesk"
   const deliveryPrice = selectedWilaya ? getDeliveryPrice(selectedWilaya.name, isStopdesk) : 0
   const totalPrice = BOOK_PRICE + deliveryPrice
 
-  function onSubmit(data: FormValues) {
-    setFormError(null)
+  const stopdeskInCommune = !selectedCenter || !selectedCommune || selectedCenter.commune_id === selectedCommune.id
 
+  function submitOrder(data: FormValues, orderDeliveryPrice: number) {
     const wilaya = wilayas.find(w => w.id === Number(data.wilaya_id))
     const commune = communes.find(c => c.id === Number(data.commune_id))
 
     if (!wilaya || !commune) return
-
-    const orderDeliveryPrice = getDeliveryPrice(wilaya.name, data.is_stopdesk === "stopdesk")
 
     createOrder.mutate({
       data: {
@@ -122,6 +125,39 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
     })
   }
 
+  function onSubmit(data: FormValues) {
+    setFormError(null)
+
+    const wilaya = wilayas.find(w => w.id === Number(data.wilaya_id))
+    const commune = communes.find(c => c.id === Number(data.commune_id))
+
+    if (!wilaya || !commune) return
+
+    const orderDeliveryPrice = getDeliveryPrice(wilaya.name, data.is_stopdesk === "stopdesk")
+
+    const center = centers.find(c => c.center_id === Number(data.stopdesk_id))
+    const centerNotInCommune = data.is_stopdesk === "stopdesk" && center && commune && center.commune_id !== commune.id
+
+    if (centerNotInCommune) {
+      setPendingData({ data, deliveryPrice: orderDeliveryPrice })
+      return
+    }
+
+    submitOrder(data, orderDeliveryPrice)
+  }
+
+  function confirmStopDeskAnyway() {
+    if (!pendingData) return
+    submitOrder(pendingData.data, pendingData.deliveryPrice)
+    setPendingData(null)
+  }
+
+  function changeStopDesk() {
+    setPendingData(null)
+    form.setValue("stopdesk_id", "")
+    stopdeskSelectRef.current?.focus()
+  }
+
   return (
     <div className="w-full max-w-xl mx-auto bg-card rounded-md shadow-sm border border-card-border p-6 sm:p-10 relative overflow-hidden">
       
@@ -138,6 +174,37 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
       {formError && (
         <div className="mb-6 p-4 rounded bg-destructive/10 text-destructive border border-destructive/20 text-sm">
           {formError}
+        </div>
+      )}
+
+      {pendingData && (
+        <div className="mb-6 p-4 rounded border border-amber-200 bg-amber-50 text-amber-900 dark:bg-amber-950/30 dark:text-amber-100 dark:border-amber-900/50 text-sm">
+          <div className="flex items-start gap-3 mb-3">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold mb-1">المكتب المختار لا يقع في بلديتك</p>
+              <p className="opacity-90">
+                بعض الزبائن يفضلون استلام طلباتهم من مكتب بعيد. إذا كنت تريد ذلك، يمكنك التأكيد. وإلا اختر مكتباً في بلديتك.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 border-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+              onClick={changeStopDesk}
+            >
+              تغيير المكتب
+            </Button>
+            <Button
+              type="button"
+              className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
+              onClick={confirmStopDeskAnyway}
+            >
+              تأكيد على أي حال
+            </Button>
+          </div>
         </div>
       )}
 
@@ -199,6 +266,7 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
                     field.onChange(val)
                     form.setValue("commune_id", "")
                     form.setValue("stopdesk_id", "")
+                    setPendingData(null)
                   }} defaultValue={field.value} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -224,7 +292,11 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>البلدية</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={!watchWilayaId || loadingCommunes}>
+                  <Select onValueChange={(val) => {
+                    field.onChange(val)
+                    form.setValue("stopdesk_id", "")
+                    setPendingData(null)
+                  }} value={field.value} disabled={!watchWilayaId || loadingCommunes}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={!watchWilayaId ? "اختر الولاية أولاً" : loadingCommunes ? "جاري التحميل..." : "اختر البلدية"} />
@@ -252,7 +324,11 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
                 <FormLabel>نوع التوصيل</FormLabel>
                 <FormControl>
                   <RadioGroup
-                    onValueChange={field.onChange}
+                    onValueChange={(val) => {
+                      field.onChange(val)
+                      form.setValue("stopdesk_id", "")
+                      setPendingData(null)
+                    }}
                     defaultValue={field.value}
                     className="flex flex-col space-y-1"
                   >
@@ -300,11 +376,14 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
               control={form.control}
               name="stopdesk_id"
               render={({ field }) => (
-                <FormItem className="animate-in fade-in slide-in-from-top-2">
+                <FormItem className={`animate-in fade-in slide-in-from-top-2 ${!stopdeskInCommune ? "border border-amber-300 rounded-md p-3 bg-amber-50/50 dark:bg-amber-950/20" : ""}`}>
                   <FormLabel>اختر المكتب</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={!watchWilayaId || loadingCenters}>
+                  <Select onValueChange={(val) => {
+                    field.onChange(val)
+                    setPendingData(null)
+                  }} value={field.value} disabled={!watchWilayaId || loadingCenters}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger ref={stopdeskSelectRef}>
                         <SelectValue placeholder={!watchWilayaId ? "اختر الولاية أولاً" : loadingCenters ? "جاري التحميل..." : "اختر المكتب الأقرب إليك"} />
                       </SelectTrigger>
                     </FormControl>
@@ -320,6 +399,12 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
                       )}
                     </SelectContent>
                   </Select>
+                  {!stopdeskInCommune && selectedCenter && selectedCommune && (
+                    <p className="text-xs text-amber-700 dark:text-amber-300 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      المكتب في {selectedCenter.commune_name} وليس في بلديتك ({selectedCommune.name})
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -347,7 +432,7 @@ export function OrderForm({ onSuccess }: OrderFormProps) {
           <Button 
             type="submit" 
             className="w-full h-14 text-lg font-serif tracking-wide bg-foreground text-background hover:bg-foreground/90 mt-8"
-            disabled={createOrder.isPending}
+            disabled={createOrder.isPending || !!pendingData}
           >
             {createOrder.isPending ? "جاري الإرسال..." : `تأكيد الطلب — ${selectedWilaya ? totalPrice.toLocaleString("ar-DZ") : "1200"} د.ج`}
           </Button>
