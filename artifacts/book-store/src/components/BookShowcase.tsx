@@ -17,7 +17,6 @@ export function BookShowcase() {
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 max-w-5xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
-      
       {/* Book Cover Image */}
       <div className="relative group shrink-0">
         <div className="absolute -inset-4 bg-black/5 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition duration-1000"></div>
@@ -29,7 +28,6 @@ export function BookShowcase() {
           />
         </div>
       </div>
-
       {/* Book Info */}
       <div className="text-center md:text-right max-w-lg shrink">
         
@@ -37,9 +35,7 @@ export function BookShowcase() {
           تحت راية<br/>الطوفان
         </h1>
         
-        <p className="text-xl md:text-2xl text-muted-foreground font-serif leading-relaxed mb-8">
-          عندما تصبح الكلمة الملاذ الأخير، والورقة ساحة للصمود. هذا الكتاب ليس مجرد نصوص، بل هو وداع شخصي وشهادة أخيرة.
-        </p>
+        <p className="text-xl md:text-2xl text-muted-foreground font-serif leading-relaxed mb-8">مِّنَ الْمُؤْمِنِينَ رِجَالٌ صَدَقُوا مَا عَاهَدُوا اللَّهَ عَلَيْهِ ۖ فَمِنْهُم مَّن قَضَىٰ نَحْبَهُ وَمِنْهُم مَّن يَنتَظِرُ ۖ وَمَا بَدَّلُوا تَبْدِيلًا</p>
 
         <div className="flex flex-col sm:flex-row items-center sm:items-end justify-center md:justify-start gap-4 mb-8">
           <div className="flex items-baseline gap-2">
@@ -57,7 +53,6 @@ export function BookShowcase() {
 
         <div className="w-12 h-px bg-border mx-auto md:mx-0"></div>
       </div>
-      
     </div>
-  )
+  );
 }
