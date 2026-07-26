@@ -12,9 +12,24 @@ const staggerContainer = {
 }
 
 const pressOutlets = [
-  { name: "الشروق", line: "كتاب يلتقط أصواتاً من هامش التاريخ الجزائري." },
-  { name: "الخبر", line: "نصوص تتجاوز السرد إلى شهادة حية." },
-  { name: "الوطن", line: "صوت يستحق أن يُقرأ بتمهل وبصوت عالٍ." }
+  {
+    name: "الجزيرة نت",
+    line: "بين المحراب والأنفاق.. قصة محمد زكي حمد التي خلدتها المنصات",
+    url: "https://www.aljazeera.net/news/2026/5/3/%D8%A8%D9%8A%D9%86-%D8%A7%D9%84%D9%85%D8%AD%D8%B1%D8%A7%D8%A8-%D9%88%D8%A7%D9%84%D8%A3%D9%86%D9%81%D8%A7%D9%82-%D9%82%D8%B5%D8%A9-%D9%85%D8%AD%D9%85%D8%AF-%D8%B2%D9%83%D9%8A-%D8%AD%D9%85%D8%AF",
+    image: "https://www.aljazeera.net/wp-content/uploads/2026/05/54545454-1777821736.jpg?resize=1920%2C1280&quality=80",
+  },
+  {
+    name: "جريدة القدس",
+    line: "بين المحراب والأنفاق.. سيرة الشهيد محمد زكي حمد قائد فصيل 'بيت حانون' ومؤلف 'تحت راية الطوفان'",
+    url: "https://alquds.com/ar/posts/238114",
+    image: "https://cdn.alquds.com/uploads/8181f3bc6614b7bdc7fdca167888a42f.jpg",
+  },
+  {
+    name: "TRT عربي",
+    line: "\"تحت راية الطوفان\".. ملامح من عالَم رجل الأنفاق محمد حمد زكي",
+    url: "https://www.trtarabi.com/article/be5856deb43e",
+    image: "https://d2udx5iz3h7s4h.cloudfront.net/2025/12/5/67336bb1cfcbfe8e438f5e44/image/bf5732c6be534e0e36fd410861c94d68412b8b9deceedf91e0a56d4ab9904974.jpg?width=1080&format=jpg&quality=80",
+  },
 ]
 
 export function AuthorSection() {
@@ -95,21 +110,38 @@ export function AuthorSection() {
 
         {/* Press */}
         <motion.div variants={fadeInUp}>
-          <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">مقالات عنه</h3>
+          <h3 className="text-2xl font-serif font-bold text-foreground mb-8 text-center md:text-right">تغطيات إعلامية</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {pressOutlets.map((outlet) => (
-              <div
+              <a
                 key={outlet.name}
-                className="group relative overflow-hidden rounded-md border border-card-border bg-card p-6 hover:border-primary/40 transition-colors"
+                href={outlet.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative overflow-hidden rounded-md border border-card-border bg-card hover:border-primary/40 transition-colors block"
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500" />
-                <div className="relative z-10">
-                  <span className="block text-xl font-bold font-serif text-foreground mb-2 group-hover:text-white transition-colors">{outlet.name}</span>
-                  <p className="text-sm text-muted-foreground group-hover:text-white/90 transition-colors leading-relaxed">
+                <div className="relative aspect-video overflow-hidden">
+                  <img
+                    src={outlet.image}
+                    alt={outlet.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500" />
+                </div>
+                <div className="relative p-6">
+                  <span className="block text-lg font-bold font-serif text-foreground mb-2">{outlet.name}</span>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {outlet.line}
                   </p>
+                  <span className="inline-flex items-center mt-4 text-sm font-medium text-primary group-hover:underline">
+                    اقرأ المقال
+                    <svg className="w-4 h-4 mr-2 rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </span>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </motion.div>
