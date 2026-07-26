@@ -5,6 +5,7 @@ import pic2 from "@assets/2_1785101007279.jpg"
 import pic3 from "@assets/2_1785101177198.jpeg"
 import pic4 from "@assets/5_1785101184164.jpg"
 import pic5 from "@assets/just_enhance_quality_2K_202607260333_1785101228180.jpeg"
+import authorImage from "@assets/make_it_text_free_2K_202607262304_1785103593945.jpeg"
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -86,7 +87,7 @@ export function AuthorSection() {
             <div className="absolute -inset-3 bg-gradient-to-br from-primary/20 to-transparent blur-xl rounded-full opacity-60 group-hover:opacity-100 transition duration-700" />
             <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-2 border-border shadow-lg grayscale group-hover:grayscale-0 transition-all duration-700">
               <img
-                src={`${import.meta.env.BASE_URL}book_cover.jpg`}
+                src={authorImage}
                 alt="صورة الكاتب"
                 className="w-full h-full object-cover"
               />
