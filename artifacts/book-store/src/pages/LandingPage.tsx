@@ -8,7 +8,7 @@ import { OrderForm } from "@/components/OrderForm"
 import { OrderSuccess } from "@/components/OrderSuccess"
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp"
 
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? "213XXXXXXXXX"
+const WHATSAPP_NUMBER = "213563289607"
 const WHATSAPP_MESSAGE = "مرحباً، أودّ الاستفسار عن كتاب «تحت راية الطوفان»"
 
 export default function LandingPage() {
