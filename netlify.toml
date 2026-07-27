@@ -1,0 +1,33 @@
+[build]
+  # Install deps, build the serverless function, then build the frontend.
+  # BASE_PATH=/ puts the Vite app at the site root (not a sub-path).
+  command = "pnpm install --frozen-lockfile && BASE_PATH=/ pnpm --filter @workspace/book-store run build"
+  publish  = "artifacts/book-store/dist/public"
+  functions = "netlify/functions"
+
+[functions]
+  # Netlify's built-in esbuild bundler resolves pnpm workspace symlinks and
+  # compiles TypeScript automatically. pino-pretty (worker-based) is only
+  # loaded when NODE_ENV != production, so it is safe to exclude it here.
+  node_bundler = "esbuild"
+  included_files = []
+
+[functions."api"]
+  # Ensures the function is treated as ESM (matching the project's "type":"module")
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Route every /api/* call directly to the serverless function.
+[[redirects]]
+  from   = "/api/*"
+  to     = "/.netlify/functions/api/:splat"
+  status = 200
+  force  = true
+
+# SPA fallback – all other paths serve index.html.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
