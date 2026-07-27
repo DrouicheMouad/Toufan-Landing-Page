@@ -195,18 +195,22 @@ router.post("/orders", async (req, res): Promise<void> => {
        <p>العميل: ${customerName} — ${normalizedPhone}</p>
        <p>الخطأ: ${errorMessage}</p>`;
 
-  // Don't await notifications — respond to customer first
-  Promise.all([
-    sendTelegramNotification(notifMessage),
-    sendEmailNotification(
-      success ? `📦 طلب جديد — ${customerName} — ${body.to_wilaya_name}` : `⚠️ طلب فاشل — ${customerName}`,
-      emailHtml
-    ),
-  ]).catch((err) => logger.error({ err }, "Notification error"));
+  // Await notifications before responding so Netlify doesn't kill them
+    try {
+      await Promise.all([
+        sendTelegramNotification(notifMessage),
+        sendEmailNotification(
+          success ? `📦 طلب جديد — ${customerName} — ${body.to_wilaya_name}` : `⚠️ طلب فاشل — ${customerName}`,
+          emailHtml
+        ),
+      ]);
+    } catch (err) {
+      logger.error({ err }, "Notification error");
+    }
 
-  res.status(200).json(
-    CreateOrderResponse.parse({ success, tracking, label, message: errorMessage })
-  );
-});
+    res.status(200).json(
+      CreateOrderResponse.parse({ success, tracking, label, message: errorMessage })
+    );
+  });
 
-export default router;
+  export default router;
