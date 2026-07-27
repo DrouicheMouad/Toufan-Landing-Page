@@ -23,7 +23,7 @@ services:
     env: static
     region: frankfurt
     plan: free
-    buildCommand: corepack enable && pnpm install --no-frozen-lockfile && BASE_PATH=/ pnpm --filter @workspace/book-store run build
+    buildCommand: corepack enable && pnpm install --no-frozen-lockfile && PORT=3000 BASE_PATH=/ pnpm --filter @workspace/book-store run build
     staticPublishPath: artifacts/book-store/dist/public
     routes:
       - type: rewrite
