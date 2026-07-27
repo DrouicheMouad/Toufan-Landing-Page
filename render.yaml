@@ -1,32 +1,32 @@
-                      services:
-                      - type: web
-                        name: Toufan-Landing-Page
-                        env: node
-                        region: frankfurt
-                        plan: free
-                        buildCommand: corepack enable && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build
-                        startCommand: pnpm --filter @workspace/api-server run start
-                        envVars:
-                          - key: NODE_VERSION
-                            value: 20.18.0
-                          - key: NODE_ENV
-                            value: production
-                          - key: GUEPEX_API_ID
-                            sync: false
-                          - key: GUEPEX_API_TOKEN
-                            sync: false
-                          - key: SESSION_SECRET
-                            sync: false
+                           services:
+                           - type: web
+                             name: Toufan-Landing-Page
+                             env: node
+                             region: frankfurt
+                             plan: free
+                             buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build
+                             startCommand: pnpm --filter @workspace/api-server run start
+                             envVars:
+                               - key: NODE_VERSION
+                                 value: 20.18.0
+                               - key: NODE_ENV
+                                 value: production
+                               - key: GUEPEX_API_ID
+                                 sync: false
+                               - key: GUEPEX_API_TOKEN
+                                 sync: false
+                               - key: SESSION_SECRET
+                                 sync: false
 
-                      - type: web
-                        name: Toufan-Landing-Page-Frontend
-                        runtime: static
-                        buildCommand: pnpm install --no-frozen-lockfile && PORT=3000 BASE_PATH=/ pnpm --filter @workspace/book-store run build
-                        staticPublishPath: artifacts/book-store/dist/public
-                        routes:
-                          - type: rewrite
-                            source: /api/*
-                            destination: https://toufan-landing-page.onrender.com/api/:splat
-                          - type: rewrite
-                            source: /*
-                            destination: /index.html
+                           - type: web
+                             name: Toufan-Landing-Page-Frontend
+                             runtime: static
+                             buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && PORT=3000 BASE_PATH=/ pnpm --filter @workspace/book-store run build
+                             staticPublishPath: artifacts/book-store/dist/public
+                             routes:
+                               - type: rewrite
+                                 source: /api/*
+                                 destination: https://toufan-landing-page.onrender.com/api/:splat
+                               - type: rewrite
+                                 source: /*
+                                 destination: /index.html
