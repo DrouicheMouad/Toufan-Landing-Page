@@ -37,7 +37,7 @@ router.get("/wilayas", async (req, res): Promise<void> => {
       res.status(500).json({ error: "Invalid response from Guepex" });
       return;
     }
-    res.json(parsed.data.filter((w) => w.is_deliverable));
+    res.json(parsed.data.filter((w: any) => w.is_deliverable));
   } catch (err) {
     req.log.error({ err }, "Error fetching wilayas");
     res.status(500).json({ error: "Server error" });
@@ -70,7 +70,7 @@ router.get("/communes", async (req, res): Promise<void> => {
       res.status(500).json({ error: "Invalid response from Guepex" });
       return;
     }
-    res.json(parsed.data.filter((c) => c.is_deliverable));
+    res.json(parsed.data.filter((c: any) => c.is_deliverable));
   } catch (err) {
     req.log.error({ err }, "Error fetching communes");
     res.status(500).json({ error: "Server error" });
