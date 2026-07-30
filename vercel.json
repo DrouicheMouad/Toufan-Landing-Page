@@ -8,6 +8,7 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.mjs" },
-    { "src": "/(.*)", "dest": "/artifacts/book-store/dist/public/$1" }
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/artifacts/book-store/dist/public/index.html" }
   ]
 }
