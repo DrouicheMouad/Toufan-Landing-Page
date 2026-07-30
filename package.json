@@ -11,11 +11,16 @@
   "private": true,
   "packageManager": "pnpm@10.26.1",
   "dependencies": {
-    "@replit/connectors-sdk": "^0.4.1",
     "serverless-http": "^4.0.0"
   },
   "devDependencies": {
     "prettier": "^3.9.5",
     "typescript": "~5.9.3"
+  },
+  "optionalDependencies": {
+    "@replit/connectors-sdk": "^0.4.1",
+    "@rollup/rollup-win32-x64-msvc": "^4.62.3",
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.3.3",
+    "lightningcss-win32-x64-msvc": "^1.33.0"
   }
 }
